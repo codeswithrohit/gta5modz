@@ -9,7 +9,7 @@ import React from 'react'
 
 const Index = () => {
   return (
-    <div className='bg-white' >
+    <div className='' >
       <Navbar/>
       <Indexfirest/>
       <IndexTwo/>
