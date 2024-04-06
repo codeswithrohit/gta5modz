@@ -61,7 +61,7 @@ const Footer = () => {
             <li class="mt-[15px]">
             <article class="relative flex flex-row overflow-hidden rounded-lg border">
         <div class="aspect-square overflow-hidden">
-          <img class="h-24 w-16 object-cover transition-all duration-300 group-hover:scale-125" src="footerimg.jpg" alt="" />
+          <img class="h-24 w-16 object-cover transition-all duration-300 group-hover:scale-125" src="hl.jpg" alt="" />
         </div>
 
         <div class="my-4 mx-auto flex w-10/12 flex-col items-start justify-between">
@@ -113,13 +113,13 @@ const Footer = () => {
       </div>
     </div>
     <hr class="mt-[30px] text-white" />
-    <div class="flex items-center justify-center pb-8 pt-[9px] md:py-8">
+    {/* <div class="flex items-center justify-center pb-8 pt-[9px] md:py-8">
       <p class="text-[10px] font-normal text-white md:text-[12px]">
         © Copyright
        2024
          All Rights Reserved by RS All Solution Hub
       </p>
-    </div>
+    </div> */}
   </div>
 </div>
     </div>

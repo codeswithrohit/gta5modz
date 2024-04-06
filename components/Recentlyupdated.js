@@ -5,7 +5,7 @@ const Recentlyupdated = () => {
     <div className='px-12' >
       <div className="w-80 bg-white shadow rounded">
         <div className="h-48 w-full bg-gray-200 flex flex-col justify-between p-4 bg-cover bg-center"
-          style={{backgroundImage: "url('https://gta5modaz.com/wp-content/uploads/2022/09/gta_5_mods_Muscle_orange_Roblox_Rainbow_Friend_thumb-280x280.jpg')"}}>
+          style={{backgroundImage: "url('krrish5 (1).png')"}}>
           
           <div>
             <span className="uppercase text-xs bg-green-50 p-0.5 border-green-500 border rounded text-green-700 font-medium select-none">

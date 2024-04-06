@@ -18,7 +18,7 @@ const Gameproduct = () => {
     </div>
       <article class="relative h-72 w-48 flex flex-col overflow-hidden rounded-lg border">
         <div class=" overflow-hidden">
-          <img class="h-72 w-48 object-cover transition-all duration-300 group-hover:scale-125" src="https://gta5modaz.com/wp-content/uploads/2020/07/electric_fan_head_thumb-100x100.jpg" alt="" />
+          <img class="h-72 w-48 object-cover transition-all duration-300 group-hover:scale-125" src="a1.png" alt="" />
         </div>
 
         <div class="my-4 mx-auto flex w-10/12 flex-col items-start justify-between">
@@ -44,7 +44,7 @@ const Gameproduct = () => {
       
     <article class="relative h-72 w-48 flex flex-col overflow-hidden rounded-lg border">
         <div class=" overflow-hidden">
-          <img class="h-72 w-48 object-cover transition-all duration-300 group-hover:scale-125" src="https://gta5modaz.com/wp-content/uploads/2020/09/fall_guys_wolf_thumb-100x100.jpg" alt="" />
+          <img class="h-72 w-48 object-cover transition-all duration-300 group-hover:scale-125" src="a2.png" alt="" />
         </div>
 
         <div class="my-4 mx-auto flex w-10/12 flex-col items-start justify-between">
@@ -70,7 +70,7 @@ const Gameproduct = () => {
     </div>
     <article class="relative h-72 w-48 flex flex-col overflow-hidden rounded-lg border">
         <div class=" overflow-hidden">
-          <img class="h-72 w-48 object-cover transition-all duration-300 group-hover:scale-125" src="https://gta5modaz.com/wp-content/uploads/2019/04/thumbweb-4-100x100.jpg" alt="" />
+          <img class="h-72 w-48 object-cover transition-all duration-300 group-hover:scale-125" src="a3.png" alt="" />
         </div>
 
         <div class="my-4 mx-auto flex w-10/12 flex-col items-start justify-between">
@@ -96,7 +96,7 @@ const Gameproduct = () => {
       
     <article class="relative h-72 w-48 flex flex-col overflow-hidden rounded-lg border">
         <div class=" overflow-hidden">
-          <img class="h-72 w-48 object-cover transition-all duration-300 group-hover:scale-125" src="https://gta5modaz.com/wp-content/uploads/2021/06/gta_5_mods_captain_america_Planetary_Destroyer_thumb-100x100.jpg" alt="" />
+          <img class="h-72 w-48 object-cover transition-all duration-300 group-hover:scale-125" src="a4.png" alt="" />
         </div>
 
         <div class="my-4 mx-auto flex w-10/12 flex-col items-start justify-between">
