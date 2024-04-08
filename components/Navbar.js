@@ -106,12 +106,7 @@ export default () => {
                 <div className={`bg-white items-center gap-x-14 px-4 max-w-screen-xl mx-auto lg:flex lg:px-8 lg:static ${state ? "h-full fixed inset-x-0" : ""}`}>
                     <div className="flex items-center justify-between py-3 lg:py-5 lg:block">
                         <a href="javascript:void(0)">
-                            <img
-                                src="https://www.floatui.com/logo.svg"
-                                width={120}
-                                height={50}
-                                alt="Float UI logo"
-                            />
+                           <h1 className="text-sm font-bold " >logo</h1>
                         </a>
                         <div className="lg:hidden">
                             <button className="text-gray-500 hover:text-gray-800" onClick={() => setState(!state)}>

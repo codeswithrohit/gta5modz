@@ -59,13 +59,13 @@ const Indexfirest = () => {
     </div>
     <div class="col-span-12 sm:col-span-6 md:col-span-4">
     
-      <a class="group relative block rounded-xl overflow-hidden dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="#">
-        <div class="aspect-w-12 aspect-h-7 sm:aspect-none rounded-xl overflow-hidden">
-          <img class="group-hover:scale-105 transition-transform duration-500 ease-in-out rounded-xl w-full object-cover" src="krrish3 (1).png" alt="Image Description"/>
-        </div>
-      
-      </a>
-    </div>
+    <a class="group relative block rounded-xl overflow-hidden dark:focus:outline-none dark:focus:ring-1 dark:focus:ring-gray-600" href="#">
+      <div class="aspect-w-12 aspect-h-7 sm:aspect-none rounded-xl overflow-hidden">
+        <img class="group-hover:scale-105 transition-transform duration-500 ease-in-out rounded-xl w-full object-cover" src="p6.jpg" alt="Image Description"/>
+      </div>
+    
+    </a>
+  </div>
   </div>
 </div>
     </div>
