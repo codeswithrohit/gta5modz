@@ -53,7 +53,7 @@ const AvatarMenu = ({ userData,handleLogout }) => {
                             Signed in as:
                           </p>
                           <a
-                            href="/Profile"
+                            href="#"
                             class="flex px-4 py-2 text-sm font-semibold text-black border-l-2 border-transparent hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600 dark:hover:text-red-600"
                           >
                             <span class="mr-2">
