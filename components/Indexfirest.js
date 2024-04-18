@@ -2,7 +2,7 @@ import React from 'react'
 
 const Indexfirest = () => {
   return (
-    <div className='px-16' >
+    <div className='px-16 relative z-30' >
       <div className='flex items-center justify-center'>
   <hr className='border-t border-yellow-500 flex-grow' />
   <h1 className='mx-4 text-xl md:text-3xl font-bold text-yellow-500'>Best Seller</h1>

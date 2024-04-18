@@ -10,13 +10,11 @@ import React from 'react'
 const Index = () => {
   return (
     <div className='bg-white' >
-      <Navbar/>
       <Indexfirest/>
       <IndexTwo/>
       <Recentlyupdated/>
       <Testimonial/>
       <Gameproduct/>
-      <Footer/>
     </div>
   )
 }

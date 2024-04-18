@@ -7,12 +7,12 @@ const Footer = () => {
   <div class="mx-auto w-full max-w-[1166px] px-4 xl:px-0">
     <div class="flex flex-col justify-between sm:px-[18px] md:flex-row md:px-10">
       <div class="md:w-[316px]">
-        <p class="text-[18px] font-medium text-white">
+        <div class="text-[18px] font-medium text-white">
         <div class="mx-auto max-w-md text-center">
       <h2 class="font-serif text-sm font-bold sm:text-lg uppercase">About Us</h2>
       <div class="border-b-4 border-black w-16 mx-auto mt-2"></div>
     </div>
-        </p>
+        </div>
         <p class="mt-[18px] text-[15px] font-normal text-white/[80%]">We are a small team creating GTA 5 MODS for those who want to play their favorite characters in GTA 5. You can donate us by buying mods or becoming membership. We love this job and we love you !</p>
         <div class="mt-[18px] flex gap-4">
           <a class="hover:scale-110" target="_blank"

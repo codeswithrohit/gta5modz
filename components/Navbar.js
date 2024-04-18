@@ -1,7 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { FaFacebookF, FaTwitter, FaInstagram, FaEnvelope, FaPinterest, FaLinkedinIn, FaChartBar, FaHome, FaCube, FaTags, FaMoneyBillAlt, FaEllipsisH, FaInfoCircle } from 'react-icons/fa';
 
-const AvatarMenu = () => {
+import { firebase } from '../Firebase/config';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getAuth, signOut } from 'firebase/auth';
+import Link from "next/link";
+import { FaUser, FaShoppingCart } from "react-icons/fa"; // Import the cart icon
+
+const AvatarMenu = ({ userData,handleLogout }) => {
     const [state, setState] = useState(false);
     const profileRef = useRef();
 
@@ -23,31 +29,97 @@ const AvatarMenu = () => {
     }, []);
 
     return (
-        <div className="relative border-t lg:border-none">
+        <div className="relative border-t lg:border-none z-30">
             <div className="">
                 <button
                     ref={profileRef}
-                    className="hidden w-10 h-10 outline-none rounded-full ring-offset-2 ring-gray-200 lg:focus:ring-2 lg:block"
+                    className=""
                     onClick={() => setState(!state)}
                 >
-                    <img
-                        src="https://api.uifaces.co/our-content/donated/xZ4wg2Xj.jpg"
-                        className="w-full h-full rounded-full"
-                        alt="Profile"
-                    />
+                    {userData ? (
+                        <FaUser className="md:w-4 md:h-4 w-8 h-8 text-black text-center cursor-pointer" />
+                    ) : (
+                        <FaUser className="w-full h-full rounded-full" />
+                    )}
                 </button>
             </div>
             <ul className={`bg-white top-14 right-0 mt-6 space-y-6 lg:absolute lg:border lg:rounded-md lg:w-52 lg:shadow-md lg:space-y-0 lg:mt-0 ${state ? '' : 'lg:hidden'}`}>
-                {navigation.map((item, idx) => (
-                    <li key={idx}>
-                        <a className="block text-gray-600 hover:text-gray-900 lg:hover:bg-gray-50 lg:p-3" href={item.path}>
-                            {item.title}
-                        </a>
-                    </li>
-                ))}
-                <button className="block w-full text-justify text-gray-600 hover:text-gray-900 border-t py-3 lg:hover:bg-gray-50 lg:p-3">
-                    Logout
-                </button>
+            <div class="absolute  right-0 w-48 top-4   bg-white shadow-lg rounded-2xl dark:bg-gray-700 ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        <div
+                          class="py-1 border-b border-gray-200 dark:border-gray-600"
+                          role="none"
+                        >
+                          <p class="px-4 pt-2 mb-1 font-normal text-black dark:text-black">
+                            Signed in as:
+                          </p>
+                          <a
+                            href="/Profile"
+                            class="flex px-4 py-2 text-sm font-semibold text-black border-l-2 border-transparent hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600 dark:hover:text-red-600"
+                          >
+                            <span class="mr-2">
+                              {userData.photoURL ? (
+                                  <FaUser className="w-4 h-4 text-black cursor-pointer" />
+                              ) : (
+                                <FaUser className="w-4 h-4 text-black cursor-pointer" />
+                              )}
+                            </span>
+                            {userData.username}
+                          </a>
+                        </div>
+
+                        <div class="py-1" role="none">
+                          <a
+                            href="/Order-History"
+                            class="flex px-4 py-2 text-sm text-black border-l-2 border-transparent dark:hover:border-red-600 rounded-bl-md hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600"
+                          >
+                            <span class="mr-2">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                class="w-4 h-4 hover:text-red-600 bi bi-bag"
+                              >
+                                <path
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M4 9h16v11a1 1 0 01-1 1H5a1 1 0 01-1-1V9zm7-6a2 2 0 012 2v2a2 2 0 01-2 2v0a2 2 0 01-2-2V5a2 2 0 012-2zm4 0a2 2 0 012 2v2a2 2 0 01-2 2v0a2 2 0 01-2-2V5a2 2 0 012-2z"
+                                ></path>
+                              </svg>
+                            </span>
+                            Our Order
+                          </a>
+                        </div>
+
+                        <div class="py-1" role="none">
+                          <button
+                            onClick={handleLogout}
+                            class="flex px-4 py-2 text-sm text-black border-l-2 border-transparent dark:hover:border-red-600 rounded-bl-md hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600"
+                          >
+                            <span class="mr-2">
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="w-4 h-4 hover:text-red-600 bi bi-box-arrow-right"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0v2z"
+                                />
+                                <path
+                                  fill-rule="evenodd"
+                                  d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"
+                                />
+                              </svg>
+                            </span>
+                            Logout
+                          </button>
+                        </div>
+                      </div>
             </ul>
         </div>
     );
@@ -67,7 +139,6 @@ export default () => {
     const navigation = [
         { title: "3344 mods", path: "javascript:void(0)" },
         { title: "8716 orders", path: "javascript:void(0)" },
-        { title: "login/register", path: "javascript:void(0)" },
     ];
     
     const submenuNav = [
@@ -80,9 +151,80 @@ export default () => {
         { title: "About Us", Icon: FaInfoCircle },
     ];
 
+    const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    // Add a listener to check for changes in the user's authentication state
+    const auth = getAuth();
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        setUser(user);
+        fetchUserData(user);
+      } else {
+        setUser(null);
+        setUserData(null);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user]);
+
+  const fetchUserData = async (user) => {
+    try {
+      const db = getFirestore();
+      const userDocRef = doc(db, 'Users', user.email);
+      const userDocSnap = await getDoc(userDocRef);
+
+      if (userDocSnap.exists()) {
+        setUserData(userDocSnap.data());
+      } else {
+        // Handle case where user data doesn't exist in Firestore
+        // You can create a new user profile or handle it based on your app's logic
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      setIsLoading(true); // Start the loading state
+      const auth = getAuth();
+      await signOut(auth);
+      setIsLoading(false); // End the loading state
+      toast.success('You have successfully logged out!', {
+        position: 'top-center',
+        autoClose: 3000,
+        hideProgressBar: true,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } catch (error) {
+      setIsLoading(false); // End the loading state in case of error
+      console.error('Error logging out:', error);
+    }
+  };
+console.log("user",user,"userdat",userData)
+const [showDropdown, setShowDropdown] = useState(false);
+
+const handleMouseEnter = () => {
+  setShowDropdown(true);
+};
+
+const handleMouseLeave = () => {
+  setShowDropdown(false);
+};
+
     return (
         <div>
-            <div className="hidden lg:block px">
+            <div className="hidden lg:block px relative z-40 ">
                 <section className="py-1 bg-gray-500 px-10 flex justify-between">
                     <div className="flex flex-row">
                         <a href="#"><FaFacebookF className="mx-2 text-white" /></a>
@@ -102,7 +244,7 @@ export default () => {
                     </div>
                 </section>
             </div>
-            <header className="text-base lg:text-sm">
+            <header className="text-base bg-white lg:text-sm relative z-40">
                 <div className={`bg-white items-center gap-x-14 px-4 max-w-screen-xl mx-auto lg:flex lg:px-8 lg:static ${state ? "h-full fixed inset-x-0" : ""}`}>
                     <div className="flex items-center justify-between py-3 lg:py-5 lg:block">
                         <a href="javascript:void(0)">
@@ -143,7 +285,7 @@ export default () => {
                                     </a>
                                 </li>
                             ))}
-                            {/* <AvatarMenu /> */}
+                            {userData ? <AvatarMenu handleLogout={handleLogout} userData={userData} /> : <li><Link href="/login"><div className="block text-black hover:text-black py-2 px-4 rounded-md bg-gray-200 hover:bg-white">Login/Register</div></Link></li>}
                         </ul>
                     </div>
                 </div>
