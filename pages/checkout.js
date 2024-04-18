@@ -436,7 +436,7 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
                   Terms and Conditions
                 </a>
               </p>
-              <div className="grid gap-4 sm:grid-cols-2 mt-8">
+              {/* <div className="grid gap-4 sm:grid-cols-2 mt-8">
   {hasSelectedDate ? (
     <div className="flex items-center">
       <input
@@ -485,7 +485,7 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
       <h1>Pay</h1>
     </label>
   </div>
-</div>
+</div> */}
 
 
               {isLoading ? (
@@ -557,7 +557,7 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
   </div>
 </div>
 
-              <div className="flex justify-center items-center mt-2 ">
+              {/* <div className="flex justify-center items-center mt-2 ">
                 <Link href="/our-store">
                   <button className="px-6 py-3 text-white bg-green-600 rounded-md shadow-lg hover:bg-green-600">
                     Back to our Store
@@ -591,7 +591,7 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
     Coupon code applied successfully! You saved Flat {discountPrice}%.
   </div>
 )}
-</div>
+</div> */}
 
             </div>
           </div>
