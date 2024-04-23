@@ -6,6 +6,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { firebase } from "../Firebase/config";
 import { useRouter } from "next/router";
+
 const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
   console.log(cart);
   const router = useRouter();
@@ -20,11 +21,7 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
 
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [paymentMethod, setPaymentMethod] = useState("pay");
-  const [orderId, setOrderId] = useState(null);
-  const handlePaymentMethodChange = (method) => {
-    setPaymentMethod(method);
-  };
+
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
       if (authUser) {
@@ -34,7 +31,7 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
         setUser(null);
         setUserData(null);
         setLoading(false); // Set loading to false if user is not authenticated
-        router.push("/signin");
+        router.push("/login");
       }
     });
 
@@ -112,207 +109,57 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
     }
   };
 
-  const submitOrderToMongoDB = async (oid) => {
-    try {
-      const orderData = {
-        name: name,
-        email: email,
-        orderId: oid,
-        address: address,
-        phone: phone,
-        amount: subTotal,
-        products: cart,
-      };
-  
-      const response = await fetch('/api/submitOrderToMongoDB', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData),
-      });
-  
-      if (response.ok) {
-        // Order saved successfully
-        const responseData = await response.json();
-        console.log('Order Id:', responseData); // Log the order ID
-        setOrderId(responseData.orderId); // Store the order ID in state
-        // router.push(`/order?clearCart=1&id=${responseData.orderId}`);
-        router.push(responseData.redirectUrl);
-      } else {
-        // Handle error response
-        const errorMessage = await response.text();
-        console.error('Failed to submit order:', errorMessage);
-        toast.error('Failed to submit order. Please try again.', {
-          position: 'top-center',
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }
-    } catch (error) {
-      console.error('Error submitting order to MongoDB:', error);
-      toast.error('Failed to submit order. Please try again.', {
-        position: 'top-center',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  };
-  
-  
-
-
   const initiatePayment = async () => {
     setIsLoading(true);
     let oid = Math.floor(Math.random() * Date.now());
-  
-    if (paymentMethod === "cod") {
-      // If Cash On Delivery is selected, submit data to MongoDB
-      await submitOrderToMongoDB(oid);
-      clearCart(); // Clear the cart after submitting the order
-      toast.success("Order confirmed successfully!", {
-        position: "top-center",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-      setIsLoading(false);
-    } else if (paymentMethod === "pay") {
-      const data = { cart, subTotal, oid, email: email, name, address, phone };
-      let a = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pretransaction`, {
-        method: "POST", // or 'PUT'
-        headers: {
-          "Content-Type": "application/json",
+
+    // Get a transaction token
+    const data = { cart, subTotal, oid, email: email, name, address, phone };
+    let a = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pretransaction`, {
+      method: "POST", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    let txnRes = await a.json();
+    if (txnRes.success) {
+      //console.log(txnRes)
+      let txnToken = txnRes.txnToken;
+
+      var config = {
+        root: "",
+        flow: "DEFAULT",
+        data: {
+          orderId: oid /* update order id */,
+          token: txnToken /* update token value */,
+          tokenType: "TXN_TOKEN",
+          amount: subTotal /* update amount */,
         },
-        body: JSON.stringify(data),
-      });
-      let txnRes = await a.json();
-      if (txnRes.success) {
-        //console.log(txnRes)
-        let txnToken = txnRes.txnToken;
-  
-        var config = {
-          root: "",
-          flow: "DEFAULT",
-          data: {
-            orderId: oid /* update order id */,
-            token: txnToken /* update token value */,
-            tokenType: "TXN_TOKEN",
-            amount: subTotal /* update amount */,
+        handler: {
+          notifyMerchant: function (eventName, data) {
+            console.log("notifyMerchant handler function called");
+            console.log("eventName => ", eventName);
+            console.log("data => ", data);
           },
-          handler: {
-            notifyMerchant: function (eventName, data) {
-              console.log("notifyMerchant handler function called");
-              console.log("eventName => ", eventName);
-              console.log("data => ", data);
-            },
-          },
-        };
-  
-        window.Paytm.CheckoutJS.init(config)
-          .then(function onSuccess() {
-            // after successfully updating configuration, invoke JS Checkout
-            window.Paytm.CheckoutJS.invoke();
-            setIsLoading(false);
-          })
-          .catch(function onError(error) {
-            setIsLoading(false);
-          });
-      } else {
-        setIsLoading(false);
-        if (txnRes.cartClear) {
-          clearCart();
-        }
-        toast.error(txnRes.error, {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
+        },
+      };
+
+      window.Paytm.CheckoutJS.init(config)
+        .then(function onSuccess() {
+          // after successfully updating configuration, invoke JS Checkout
+          window.Paytm.CheckoutJS.invoke();
+          setIsLoading(false);
+        })
+        .catch(function onError(error) {
+          setIsLoading(false);
         });
-      }
-    }
-  };
-  
-  const [discountPrice, setDiscountPrice] = useState(0);
-  const [couponCode, setCouponCode] = useState("");
-  const [couponApplied, setCouponApplied] = useState(false);
-  const [couponData, setCouponData] = useState([]);
-
-  useEffect(() => {
-    // Fetch coupon data from Firestore
-    const db = firebase.firestore();
-    const couponRef = db.collection("Coupan");
-
-    couponRef
-      .get()
-      .then((querySnapshot) => {
-        const coupons = [];
-        querySnapshot.forEach((doc) => {
-          coupons.push({ ...doc.data(), id: doc.id });
-        });
-
-        setCouponData(coupons);
-        setIsLoading(false);
-      })
-      .catch((error) => {
-        console.error("Error getting documents: ", error);
-        setIsLoading(false);
-      });
-  }, []);
-
-  console.log(couponData);
-
-  // Function to handle applying the coupon code
-  const applyCoupon = () => {
-    const matchedCoupon = couponData.find(
-      (coupon) => coupon.code.toUpperCase() === couponCode.toUpperCase()
-    );
-  
-    if (matchedCoupon) {
-      const expiryDate = new Date(matchedCoupon.expirydate);
-  
-      if (expiryDate > new Date()) {
-        const discount = parseFloat(matchedCoupon.price);
-        setDiscountPrice(discount);
-        const percentage = subTotal/discount
-        const discountAmount = subTotal - percentage;
-  
-        console.log("Subtotal before discount:", subTotal);
-        console.log("Discount amount:", discount);
-        console.log("New Subtotal after discount:", discountAmount);
-        setSubTotal(discountAmount);
-        setCouponApplied(true);
-      } else {
-        setCouponApplied(false);
-        console.error("Coupon has expired.");
-        toast.error("Coupon has expired.", {
-          position: "top-center",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-        });
-      }
     } else {
-      setCouponApplied(false);
-      console.error("Invalid coupon code. Please try again.");
-      toast.error("Invalid coupon code. Please try again.", {
+      setIsLoading(false);
+      if (txnRes.cartClear) {
+        clearCart();
+      }
+      toast.error(txnRes.error, {
         position: "top-center",
         autoClose: 3000,
         hideProgressBar: false,
@@ -323,12 +170,14 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
       });
     }
   };
+
+ 
   
   
-  const hasSelectedDate = Object.values(cart).some((item) => item.selectedDate);
+
   return (
     <div >
-      <div class="relative font-sans min-h-screen mx-auto w-full bg-white">
+      <div class="relative min-h-screen mx-auto w-full bg-white">
         <ToastContainer
           position="top-center"
           autoClose={3000}
@@ -349,7 +198,7 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
         <div class="grid py-12  grid-cols-10">
           <div class="col-span-full py-6 px-4 sm:py-12 lg:col-span-6 lg:py-24">
             <div class="mx-auto w-full max-w-lg">
-              <h1 class="relative uppercase text-2xl font-medium text-black sm:text-3xl">
+              <h1 class="relative text-2xl font-medium text-black sm:text-3xl">
                 {" "}
                 Checkout
                 <span class="mt-2 block h-1 w-10 bg-red-600 sm:w-20"></span>
@@ -436,99 +285,32 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
                   Terms and Conditions
                 </a>
               </p>
-              {/* <div className="grid gap-4 sm:grid-cols-2 mt-8">
-  {hasSelectedDate ? (
-    <div className="flex items-center">
-      <input
-        type="radio"
-        className="w-5 h-5 cursor-pointer"
-        id="cod"
-        checked={paymentMethod === "cod"}
-        onChange={() => handlePaymentMethodChange("cod")}
-      />
-      <label
-        htmlFor="cod"
-        className="ml-4 flex gap-2 cursor-pointer"
-      >
-        <h1>Pay at checkout </h1>
-      </label>
-    </div>
-  ) : (
-    <div className="flex items-center">
-      <input
-        type="radio"
-        className="w-5 h-5 cursor-pointer"
-        id="card"
-        checked={paymentMethod === "cod"}
-        onChange={() => handlePaymentMethodChange("cod")}
-      />
-      <label
-        htmlFor="card"
-        className="ml-4 flex gap-2 cursor-pointer"
-      >
-        <h1>Cash On Delivery</h1>
-      </label>
-    </div>
-  )}
-  <div className="flex items-center">
-    <input
-      type="radio"
-      className="w-5 h-5 cursor-pointer"
-      id="paypal"
-      checked={paymentMethod === "pay"}
-      onChange={() => handlePaymentMethodChange("pay")}
-    />
-    <label
-      htmlFor="paypal"
-      className="ml-4 flex gap-2 cursor-pointer"
-    >
-      <h1>Pay</h1>
-    </label>
-  </div>
-</div> */}
-
-
               {isLoading ? (
-  <div className="mx-4">
-    <button className="mt-4 inline-flex w-full items-center justify-center rounded bg-red-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-red-600 sm:text-lg">
-      Loading...
-    </button>
-  </div>
-) : (
-  paymentMethod === "pay" && (
-    <Link href="/checkout">
-      <button
-        disabled={disabled}
-        // onClick={initiatePayment} // commented to remove payment. 
-        className="mt-4 inline-flex w-full items-center justify-center rounded bg-red-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-red-600 sm:text-lg"
-      >
-        Make Payment ₹{subTotal}
-      </button>
-    </Link>
-  )
-)}
-
-{paymentMethod === "cod" && (
-  <button
-    disabled={disabled}
-    onClick={initiatePayment}
-    className="mt-4 inline-flex w-full items-center justify-center rounded bg-red-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-red-600 sm:text-lg"
-  >
-    Confirm Order ₹{subTotal}
-  </button>
-)}
-
-
+                <div className="mx-4">
+                  <button class="mt-4 inline-flex w-full items-center justify-center rounded bg-red-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-red-600 sm:text-lg">
+                    Loading...
+                  </button>
+                </div>
+              ) : (
+                <Link href={"/checkout"}>
+                  <button
+                    disabled={disabled}
+                    onClick={initiatePayment}
+                    class="mt-4 inline-flex w-full items-center justify-center rounded bg-red-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-red-600 sm:text-lg"
+                  >
+                    Make Payment ₹{subTotal}
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
-        
 
           <div class="relative col-span-full flex flex-col py-6 pl-8 pr-4 sm:py-12 lg:col-span-4 lg:py-24">
             <div class="px-4 pt-8">
-              <p class="text-xl font-medium uppercase">Order Summary</p>
+              <p class="text-xl font-medium">Order Summary</p>
               <div className="mt-8 space-y-3 rounded-lg border bg-white px-2 py-4 sm:px-6">
   {Object.keys(cart).length === 0 && (
-    <div className="my-4 font-semibold uppercase">Your Cart is Empty!</div>
+    <div className="my-4 font-semibold">Your Cart is Empty!</div>
   )}
   <div>
     {Object.keys(cart).map((k) => (
@@ -536,7 +318,7 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
         <img
           className="m-2 h-24 w-28 rounded-md border object-cover object-center"
           src={cart[k].frontImage}
-          alt= {cart[k].name}
+          alt=""
         />
         <div className="flex w-full flex-col px-4 py-4">
           <span className="font-semibold text-center">
@@ -545,53 +327,14 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
           <p className="text-lg font-bold text-center">
             ₹ {cart[k].price}
           </p>
-          {/* Display the selected dates in the cart */}
-          {cart[k].selectedDate && (
-            <p className="text-center text-sm text-black">
-              Booking Date: {cart[k].selectedDate.start} - {cart[k].selectedDate.end}
-            </p>
-          )}
+          
         </div>
       </div>
     ))}
   </div>
 </div>
 
-              {/* <div className="flex justify-center items-center mt-2 ">
-                <Link href="/our-store">
-                  <button className="px-6 py-3 text-white bg-green-600 rounded-md shadow-lg hover:bg-green-600">
-                    Back to our Store
-                  </button>
-                </Link>
-              </div>
-              <div class="bg-gray-100 p-6 rounded-lg shadow-lg">
-  <h1 class="text-2xl font-semibold mb-4">Apply Coupon Code</h1>
-  <span class="block text-gray-700 font-semibold mb-2">For Discount</span>
-  <div class="mb-4">
-    <input
-      type="text"
-      id="coupon"
-      name="coupon"
-      value={couponCode}
-      onChange={(e) => setCouponCode(e.target.value)}
-      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 focus:border-blue-500"
-      placeholder="Enter your coupon code"
-    />
-  </div>
-  <div class="text-center">
-    <button
-      onClick={applyCoupon}
-      class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
-    >
-      Apply Coupon
-    </button>
-  </div>
-{couponApplied && discountPrice > 0 && (
-  <div class="mt-4 text-green-500">
-    Coupon code applied successfully! You saved Flat {discountPrice}%.
-  </div>
-)}
-</div> */}
+            
 
             </div>
           </div>

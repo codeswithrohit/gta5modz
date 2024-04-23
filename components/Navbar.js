@@ -7,7 +7,8 @@ import { getAuth, signOut } from 'firebase/auth';
 import Link from "next/link";
 import { FaUser, FaShoppingCart } from "react-icons/fa"; // Import the cart icon
 
-const AvatarMenu = ({ userData,handleLogout }) => {
+const AvatarMenu = ({ userData,handleLogout,cart,cartLength }) => {
+  console.log("cartdetail",cart,cartLength)
     const [state, setState] = useState(false);
     const profileRef = useRef();
 
@@ -69,7 +70,7 @@ const AvatarMenu = ({ userData,handleLogout }) => {
 
                         <div class="py-1" role="none">
                           <a
-                            href="/Order-History"
+                            href="/Orders"
                             class="flex px-4 py-2 text-sm text-black border-l-2 border-transparent dark:hover:border-red-600 rounded-bl-md hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600"
                           >
                             <span class="mr-2">
@@ -134,7 +135,7 @@ const SubmenuNavItem = ({ title, Icon }) => (
     </li>
 );
 
-export default () => {
+export default ({user,userData}) => {
     const [state, setState] = useState(false);
     const navigation = [
         { title: "3344 mods", path: "javascript:void(0)" },
@@ -151,47 +152,43 @@ export default () => {
         { title: "About Us", Icon: FaInfoCircle },
     ];
 
-    const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [userData, setUserData] = useState(null);
+  //   const [user, setUser] = useState(null);
+  //   const [userData, setUserData] = useState(null);
 
-  useEffect(() => {
-    // Add a listener to check for changes in the user's authentication state
-    const auth = getAuth();
-    const unsubscribe = auth.onAuthStateChanged((user) => {
-      if (user) {
-        setUser(user);
-        fetchUserData(user);
-      } else {
-        setUser(null);
-        setUserData(null);
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [user]);
-
-  const fetchUserData = async (user) => {
-    try {
-      const db = getFirestore();
-      const userDocRef = doc(db, 'Users', user.email);
-      const userDocSnap = await getDoc(userDocRef);
-
-      if (userDocSnap.exists()) {
-        setUserData(userDocSnap.data());
-      } else {
-        // Handle case where user data doesn't exist in Firestore
-        // You can create a new user profile or handle it based on your app's logic
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  //   useEffect(() => {
+  //     const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
+  //       if (authUser) {
+  //         setUser(authUser.email);
+  //         fetchUserData(authUser.email); // Fetch user data based on UID
+  //       } else {
+  //         setUser(null);
+  //         setUserData(null);
+  //       }
+  //     });
+    
+  //     return () => unsubscribe();
+  //   }, []);
+  
+    
+  //   // Function to fetch user data from Firestore
+  //   const fetchUserData = async (user) => {
+  //     try {
+  //       const userDoc = await firebase
+  //         .firestore()
+  //         .collection("Users")
+  //         .doc(user)
+  //         .get();
+  //       if (userDoc.exists) {
+  //         const userData = userDoc.data();
+  //           setUserData(userData);
+        
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching user data:", error);
+  //     }
+  //  [user] };
+  
+    // console.log("nav User",user,userData)
   const handleLogout = async () => {
     try {
       setIsLoading(true); // Start the loading state
@@ -211,7 +208,7 @@ export default () => {
       console.error('Error logging out:', error);
     }
   };
-console.log("user",user,"userdat",userData)
+
 const [showDropdown, setShowDropdown] = useState(false);
 
 const handleMouseEnter = () => {
@@ -250,6 +247,12 @@ const handleMouseLeave = () => {
                         <a href="javascript:void(0)">
                            <h1 className="text-sm font-bold " >logo</h1>
                         </a>
+                        <div className="lg:hidden" >
+                            <Link href='/cart' >
+                             <FaShoppingCart className="w-6 h-6 text-gray-600 mr-2" />
+                             </Link>
+                            {userData ? <AvatarMenu handleLogout={handleLogout} userData={userData} /> : <li><Link href="/login"><div className="block text-black hover:text-black py-2 px-4 rounded-md bg-gray-200 hover:bg-white">Login/Register</div></Link></li>}
+                            </div>
                         <div className="lg:hidden">
                             <button className="text-gray-500 hover:text-gray-800" onClick={() => setState(!state)}>
                                 {state ? (
@@ -285,7 +288,12 @@ const handleMouseLeave = () => {
                                     </a>
                                 </li>
                             ))}
+                            <div className="hidden lg:block flex flex-row" >
+                            <Link href='/cart' >
+                             <FaShoppingCart className="w-6 h-6 text-gray-600 mr-2" />
+                             </Link>
                             {userData ? <AvatarMenu handleLogout={handleLogout} userData={userData} /> : <li><Link href="/login"><div className="block text-black hover:text-black py-2 px-4 rounded-md bg-gray-200 hover:bg-white">Login/Register</div></Link></li>}
+                            </div>
                         </ul>
                     </div>
                 </div>

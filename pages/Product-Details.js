@@ -12,7 +12,8 @@ import { FaStar } from 'react-icons/fa';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const ProductDetails = ({ bookNow, addToCart }) => {
+const ProductDetails = ({ bookNow, addToCart,cart }) => {
+  console.log(cart)
   const router = useRouter();
   const [rating, setRating] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
@@ -34,19 +35,21 @@ const ProductDetails = ({ bookNow, addToCart }) => {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get("id");
-
+  
     const db = firebase.firestore();
     const productRef = db.collection("Product").doc(id);
-
+  
     productRef.get().then((doc) => {
       if (doc.exists) {
-        setProductData(doc.data());
+        // Use doc.id to include the document ID in the product data
+        setProductData({ ...doc.data(), id: doc.id });
       } else {
         console.log("Document not found!");
       }
       setIsLoading(false);
     });
   }, []);
+  
 
   const [reviews, setReviews] = useState([]);
   const [loadingReviews, setLoadingReviews] = useState(true);
@@ -326,16 +329,37 @@ const ProductDetails = ({ bookNow, addToCart }) => {
          
           <hr class="my-8" />
           <div class="flex flex-wrap gap-4">
-            <button   onClick={() =>
-            bookNow(
-              productdata.id,
-              1,
-              productdata.price,
-              productdata.name,
-              productdata.frontImage
-            )
-          } type="button" class="min-w-[200px] px-4 py-3 bg-gray-800 hover:bg-gray-900 text-white text-sm font-bold rounded">Buy now</button>
-            <button type="button" class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-gray-50 text-gray-800 text-sm font-bold rounded">Add to cart</button>
+          <button
+  onClick={() =>
+    bookNow(
+      productdata.id, // Pass productdata.id as itemCode
+      1,
+      productdata.price,
+      productdata.name,
+      productdata.frontImage
+    )
+  }
+  type="button"
+  class="min-w-[200px] px-4 py-3 bg-gray-800 hover:bg-gray-900 text-white text-sm font-bold rounded"
+>
+  Buy now
+</button>
+<button
+  onClick={() =>
+    addToCart(
+      productdata.id, // Pass productdata.id as itemCode
+      1,
+      productdata.price,
+      productdata.name,
+      productdata.frontImage
+    )
+  }
+  type="button"
+  class="min-w-[200px] px-4 py-2.5 border border-gray-800 bg-transparent hover:bg-gray-50 text-gray-800 text-sm font-bold rounded"
+>
+  Add to cart
+</button>
+
           </div>
         </div>
       </div>

@@ -1,94 +1,80 @@
-
 import "@/styles/globals.css";
 import Head from "next/head";
-import { Fragment, useEffect, useState,useRef } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { firebase } from "../Firebase/config";
-import { FaTimes } from "react-icons/fa";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 function MyApp({ Component, pageProps }) {
- 
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [Productdata, setProductData] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [cartLength, setCartLength] = useState(0);
-
-  const [loader, setLoader] = useState(true);
-  useEffect(() => {
-    setTimeout(() => {
-      setLoader(false);
-    }, 1500);
-  }, []);
-
-  const [key, setKey] = useState();
-  const [progress, setProgress] = useState(0);
   const router = useRouter();
   const [cart, setCart] = useState({});
   const [subTotal, setSubTotal] = useState(0);
   const db = firebase.firestore();
 
+  const [userData, setUserData] = useState(null);
+
   useEffect(() => {
-    router.events.on("routeChangeStart", () => {
-      setProgress(40);
-    });
-    router.events.on("routeChangeComplete", () => {
-      setProgress(100);
+    const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
+      if (authUser) {
+        setUser(authUser.email);
+        fetchUserData(authUser.email); // Fetch user data based on UID
+      } else {
+        setUser(null);
+        setUserData(null);
+      }
     });
 
+    return () => unsubscribe();
+  }, []);
+
+  // Function to fetch user data from Firestore
+  const fetchUserData = async (user) => {
     try {
-      if (localStorage.getItem("cart")) {
-        const storedCart = JSON.parse(localStorage.getItem("cart"));
-        setCartLength(Object.keys(storedCart).length);
-        setCart(storedCart);
-        saveCart(storedCart);
+      const userDoc = await firebase
+        .firestore()
+        .collection("Users")
+        .doc(user)
+        .get();
+      if (userDoc.exists) {
+        const userData = userDoc.data();
+        if (userData && userData.photoURL) {
+          setUserData(userData);
+        } else {
+          // If photoURL is missing or undefined, set it to a default value or null
+          setUserData({ ...userData, photoURL: null }); // You can set a default value or handle it as per your requirement
+        }
       }
     } catch (error) {
-      localStorage.clear();
+      console.error("Error fetching user data:", error);
     }
+  };
+
+  useEffect(() => {
+    router.events.on("routeChangeStart", () => {
+      // Do something on route change start
+    });
+    router.events.on("routeChangeComplete", () => {
+      // Do something on route change complete
+    });
+
+    const storedCart = JSON.parse(localStorage.getItem("cart"));
+    if (storedCart) {
+      setCart(storedCart);
+      updateSubTotal(storedCart);
+    }
+
     const myuser = JSON.parse(localStorage.getItem("myuser"));
     if (myuser) {
-      setUser({ value: myuser.token, email: myuser.email });
+      setUser({ value: myuser.id, email: myuser.email });
     }
-    setKey(Math.random());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router.query]);
-
-  const saveCartToFirestore = async (cartData) => {
-    if (user) {
-      try {
-        await db
-          .collection("Users")
-          .doc(user.uid)
-          .collection("cart")
-          .doc("userCart")
-          .set(cartData);
-        // After saving to Firestore, update the local state subTotal
-        updateSubTotal(cartData);
-      } catch (error) {
-        console.error("Error saving cart to Firestore:", error);
-      }
-    }
-  };
-
-  const fetchCartFromFirestore = async () => {
-    if (user) {
-      try {
-        const cartDoc = await db
-          .collection("Users")
-          .doc(user.uid)
-          .collection("cart")
-          .doc("userCart")
-          .get();
-        if (cartDoc.exists) {
-          const cartData = cartDoc.data();
-          setCart(cartData);
-          updateSubTotal(cartData);
-        }
-      } catch (error) {
-        console.error("Error fetching cart from Firestore:", error);
-      }
-    }
-  };
 
   const updateSubTotal = (myCart) => {
     let subt = 0;
@@ -96,44 +82,38 @@ function MyApp({ Component, pageProps }) {
       subt += item.price * item.qty;
     });
     setSubTotal(subt);
+    localStorage.setItem("subtotal", subt);
   };
-
 
   const saveCartToLocalStorage = (cartData) => {
     localStorage.setItem("cart", JSON.stringify(cartData));
     setCartLength(Object.keys(cartData).length);
+    updateSubTotal(cartData);
   };
-
 
   const addToCart = (
     itemCode,
     qty,
     price,
     name,
-    frontImage,
-    selectedDate = null
+    frontImage
   ) => {
     if (!user) {
-      
-      router.push('/login');
-      return; // Prevent further execution of addToCart function
+      router.push("/login");
+      return;
     }
-    if (Object.keys(cart).length === 0) {
-      setKey(Math.random);
-    }
-    let newCart = cart;
+    const newCart = { ...cart };
     if (itemCode in cart) {
-      newCart[itemCode].qty = cart[itemCode].qty + qty;
+      newCart[itemCode].qty += qty;
     } else {
-      newCart[itemCode] = { qty: 1, price, name, frontImage };
+      newCart[itemCode] = { qty, price, name, frontImage };
     }
-    if (selectedDate) {
-      newCart[itemCode].selectedDate = selectedDate; // Include the selected date in the cart item
-    }
+
     setCart(newCart);
-    saveCartToFirestore(newCart);
     saveCartToLocalStorage(newCart);
-   
+
+    // Show toast notification
+    toast.success("Item added to cart!");
   };
 
   const bookNow = (
@@ -141,25 +121,17 @@ function MyApp({ Component, pageProps }) {
     qty,
     price,
     name,
-    frontImage,
-    selectedDate = null
+    frontImage
   ) => {
-    let newCart = {};
-    newCart[itemCode] = { qty: 1, price, name, frontImage };
-
-    if (selectedDate) {
-      newCart[itemCode].selectedDate = selectedDate; // If selectedDate is provided, add it to the cart
-    }
+    const newCart = { [itemCode]: { qty, price, name, frontImage } };
 
     setCart(newCart);
     saveCartToLocalStorage(newCart);
-    saveCartToFirestore(newCart);
     router.push("/checkout");
   };
 
   const clearCart = () => {
     setCart({});
-    saveCartToFirestore({});
     saveCartToLocalStorage({});
   };
 
@@ -172,105 +144,77 @@ function MyApp({ Component, pageProps }) {
       }
     }
     setCart(newCart);
-    saveCartToFirestore(newCart);
     saveCartToLocalStorage(newCart);
   };
 
   useEffect(() => {
-    fetchCartFromFirestore();
-  }, [user]);
+    const unsubscribe = firebase.auth().onAuthStateChanged(() => {
+      const db = firebase.firestore();
+      const ProductsRef = db.collection("Product");
 
+      ProductsRef.get()
+        .then((querySnapshot) => {
+          const Productdata = [];
+          querySnapshot.forEach((doc) => {
+            Productdata.push({ ...doc.data(), id: doc.id });
+          });
 
-  
+          setProductData(Productdata);
+          setIsLoading(false); // Set isLoading to false when data is fetched
+        })
+        .catch((error) => {
+          console.error("Error getting documents: ", error);
+          setIsLoading(false); // Also set isLoading to false on error
+        });
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  // Render spinner when loading
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
+      </div>
+    );
+  }
 
   return (
     <Fragment>
       <Head>
-        {/*====== Required meta tags ======*/}
-        <meta charSet="utf-8" />
-        <meta httpEquiv="x-ua-compatible" content="ie=edge" />
-        <meta name="description" content="" />
-        <meta name='robots' content="index, follow"/>
-        <meta
-          name="viewport"
-          content="width=device-width, initial-scale=1, shrink-to-fit=no"
-        />
-        {/*====== Title ======*/}
-        <title>Welcome to gt5modaz!</title>
-        {/*====== Favicon Icon ======*/}
-        <link rel="shortcut icon" href="favicon.ico" type="image/png" />
-        {/*====== Google Fonts ======*/}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-        {/*====== Flaticon css ======*/}
-        <link
-          rel="stylesheet"
-          href="assets/fonts/flaticon/flaticon_gowilds.css"
-        />
-        {/*====== FontAwesome css ======*/}
-        <link
-          rel="stylesheet"
-          href="assets/fonts/fontawesome/css/all.min.css"
-        />
-        {/*====== Bootstrap css ======*/}
-        <link
-          rel="stylesheet"
-          href="assets/vendor/bootstrap/css/bootstrap.min.css"
-        />
-        {/*====== magnific-popup css ======*/}
-        <link
-          rel="stylesheet"
-          href="assets/vendor/magnific-popup/dist/magnific-popup.css"
-        />
-        {/*====== Slick-popup css ======*/}
-        <link rel="stylesheet" href="assets/vendor/slick/slick.css" />
-        {/*====== Jquery UI css ======*/}
-        <link
-          rel="stylesheet"
-          href="assets/vendor/jquery-ui/jquery-ui.min.css"
-        />
-        {/*====== Nice Select css ======*/}
-        <link
-          rel="stylesheet"
-          href="assets/vendor/nice-select/css/nice-select.css"
-        />
-        {/*====== Animate css ======*/}
-        <link rel="stylesheet" href="assets/vendor/animate.css" />
-        {/*====== Default css ======*/}
-        <link rel="stylesheet" href="assets/css/default.css" />
-        {/*====== Style css ======*/}
-        <link rel="stylesheet" href="assets/css/style.css" />
+        {/* Meta tags, title, favicon, and other head elements */}
       </Head>
-    
-      
-     
-  
-  <Navbar
-    bookNow={bookNow}
-    cart={cart}
-    cartLength={cartLength}
-    addToCart={addToCart}
-    removeFromCart={removeFromCart}
-    clearCart={clearCart}
-    subTotal={subTotal}
-    setSubTotal={setSubTotal}
-  />
-
-        <Component
-          bookNow={bookNow}
-          cart={cart}
-          cartLength={cartLength}
-          addToCart={addToCart}
-          removeFromCart={removeFromCart}
-          clearCart={clearCart}
-          subTotal={subTotal}
-          setSubTotal={setSubTotal}
-          {...pageProps}
-        />
- 
-<Footer/>
+      <Navbar
+        bookNow={bookNow}
+        cart={cart}
+        cartLength={cartLength}
+        addToCart={addToCart}
+        removeFromCart={removeFromCart}
+        clearCart={clearCart}
+        subTotal={subTotal}
+        setSubTotal={setSubTotal}
+        userData={userData}
+        user={user}
+        Productdata={Productdata}
+      />
+      <Component
+        bookNow={bookNow}
+        cart={cart}
+        cartLength={cartLength}
+        addToCart={addToCart}
+        removeFromCart={removeFromCart}
+        clearCart={clearCart}
+        subTotal={subTotal}
+        userData={userData}
+        user={user}
+        setSubTotal={setSubTotal}
+        Productdata={Productdata}
+        {...pageProps}
+      />
+      <Footer />
+      {/* ToastContainer for displaying notifications */}
+      <ToastContainer />
     </Fragment>
   );
 }

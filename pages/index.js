@@ -7,12 +7,13 @@ import Recentlyupdated from '@/components/Recentlyupdated'
 import Testimonial from '@/components/Testimonial'
 import React from 'react'
 
-const Index = () => {
+const Index = ({Productdata,addToCart}) => {
+  console.log("home product",Productdata)
   return (
     <div className='bg-white' >
       <Indexfirest/>
       <IndexTwo/>
-      <Recentlyupdated/>
+      <Recentlyupdated Productdata={Productdata} addToCart={addToCart} />
       <Testimonial/>
       <Gameproduct/>
     </div>

@@ -660,6 +660,27 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
                 </div>
                 <div>
                   <label
+                    htmlFor="price"
+                    className="block text-sm font-medium text-black"
+                  >
+                    Product Price
+                  </label>
+                  <input
+                    type="text"
+                    id="price"
+                    name="price"
+                    value={editedProduct.price}
+                    onChange={(e) =>
+                      setEditedProduct({
+                        ...editedProduct,
+                        price: e.target.value,
+                      })
+                    }
+                    className="mt-1 focus:ring-red-500 focus:border-red-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
+                  />
+                </div>
+                <div>
+                  <label
                     htmlFor="category"
                     className="block text-sm font-medium text-black"
                   >
