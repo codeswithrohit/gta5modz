@@ -247,7 +247,7 @@ const handleCheckout = () => {
                         Signed in as:
                       </p>
                       <a
-                        href="/Profile"
+                        href="#"
                         className="flex px-4 py-2 text-sm font-semibold text-black border-l-2 border-transparent hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600 dark:hover:text-red-600"
                       >
                         <span className="mr-2">
@@ -418,7 +418,7 @@ const handleCheckout = () => {
                               Signed in as:
                             </p>
                             <a
-                              href="/Profile"
+                              href="#"
                               className="flex px-4 py-2 text-sm font-semibold text-black border-l-2 border-transparent hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600 dark:hover:text-red-600"
                             >
                               <span className="mr-2">

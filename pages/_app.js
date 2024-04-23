@@ -55,7 +55,7 @@ function MyApp({ Component, pageProps }) {
       console.error("Error fetching user data:", error);
     }
   };
-
+console.log("userdata",userData)
   useEffect(() => {
     router.events.on("routeChangeStart", () => {
       // Do something on route change start
