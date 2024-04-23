@@ -174,9 +174,12 @@ function MyApp({ Component, pageProps }) {
   // Render spinner when loading
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-24 w-24"></div>
-      </div>
+      <div class='flex space-x-2 justify-center items-center bg-white h-screen dark:invert'>
+          <span class='sr-only'>Loading...</span>
+           <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+         <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+         <div class='h-8 w-8 bg-black rounded-full animate-bounce'></div>
+     </div>
     );
   }
 
