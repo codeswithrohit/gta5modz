@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AdminNavbar from "@/components/AdminNavbar";
 const db = firebase.firestore();
 const Product = () => {
   const router = useRouter(); 
@@ -318,7 +319,8 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
 
   return (
     <div className="m-auto min-h-screen bg-white dark:bg-gray-900">
-      <section className="bg-white   dark:bg-gray-900">
+      <AdminNavbar/>
+      <section className="bg-white lg:ml-64  dark:bg-gray-900">
       <h1 className="text-xl text-red-600 text-center font-bold" >Our Products</h1>
         <div className="container px-6 py-10 mx-auto">
           {showAllInputFormats ? (

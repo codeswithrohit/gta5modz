@@ -15,6 +15,7 @@ function MyApp({ Component, pageProps }) {
   const [cartLength, setCartLength] = useState(0);
   const router = useRouter();
   const [cart, setCart] = useState({});
+  const [showNavbarFooter, setShowNavbarFooter] = useState(true);
   const [subTotal, setSubTotal] = useState(0);
   const db = firebase.firestore();
 
@@ -183,24 +184,32 @@ console.log("userdata",userData)
   //   );
   // }
 
+  useEffect(() => {
+    // Check if the route starts with "/Admin" and hide Navbar and Footer accordingly
+    setShowNavbarFooter(!router.pathname.startsWith("/Admin"));
+  }, [router.pathname]);
+
   return (
     <Fragment>
       <Head>
         {/* Meta tags, title, favicon, and other head elements */}
       </Head>
-      <Navbar
-        bookNow={bookNow}
-        cart={cart}
-        cartLength={cartLength}
-        addToCart={addToCart}
-        removeFromCart={removeFromCart}
-        clearCart={clearCart}
-        subTotal={subTotal}
-        setSubTotal={setSubTotal}
-        userData={userData}
-        user={user}
-        Productdata={Productdata}
-      />
+      
+      {showNavbarFooter && (
+        <Navbar
+          bookNow={bookNow}
+          cart={cart}
+          cartLength={cartLength}
+          addToCart={addToCart}
+          removeFromCart={removeFromCart}
+          clearCart={clearCart}
+          subTotal={subTotal}
+          setSubTotal={setSubTotal}
+          userData={userData}
+          user={user}
+          Productdata={Productdata}
+        />
+      )}
       <Component
         bookNow={bookNow}
         cart={cart}
@@ -215,7 +224,7 @@ console.log("userdata",userData)
         Productdata={Productdata}
         {...pageProps}
       />
-      <Footer />
+        {showNavbarFooter && <Footer />}
       {/* ToastContainer for displaying notifications */}
       <ToastContainer />
     </Fragment>
