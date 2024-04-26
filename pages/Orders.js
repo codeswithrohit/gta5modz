@@ -2,53 +2,13 @@ import React, { useEffect, useState } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import { firebase } from "../Firebase/config";
+import { firebase } from "../Firebase/config"; // Import db from Firebase config
+
 const Orders = () => {
   const router = useRouter();
   const [orders, setOrders] = useState([]);
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true); // State to track loading
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-  
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_HOST}/api/myorders`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-           
-          }
-        );
-
-        if (res.ok) {
-          const data = await res.json();
-          console.log("data",data)
-          // Filter orders based on user email
-          const filteredOrders = data.orders.filter(
-            (order) => order.email === user.email
-          );
-          setOrders(filteredOrders);
-        } else {
-          // Handle unsuccessful response if needed
-        }
-      } catch (error) {
-        // Handle fetch error
-        console.error("Error fetching orders:", error);
-      } finally {
-        setLoading(false); // Update loading state after fetching
-      }
-    };
-
-    if (!localStorage.getItem("myuser")) {
-        fetchOrders();
-    } else {
-      fetchOrders();
-    }
-  }, [router, user]); // Include user.email in the dependency array
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((authUser) => {
@@ -61,18 +21,42 @@ const Orders = () => {
 
     return () => unsubscribe();
   }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true); // Set loading to true when starting to fetch data
+        const snapshot = await firebase.firestore().collection('orders').where("email", "==", user.email).get();
+        if (!snapshot.empty) {
+          const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setOrders(data);
+        } else {
+          console.log('No orders found for this user!');
+          setOrders([]); // Assuming you want to set orders to an empty array if no orders found
+        }
+      } catch (error) {
+        console.error('Error fetching orders:', error);
+      } finally {
+        setLoading(false); // Set loading to false when fetching is complete
+      }
+    };
+  
+    fetchData();
+  
+  }, [user]);
+  
 
-  console.log("orderuser",user)
+  console.log("order", orders,);
+
   return (
-    <div >
+    <div className="bg-white">
       <div>
         {loading ? ( // Display loading indicator if loading is true
-         <div class='flex space-x-2 justify-center items-center bg-white h-screen dark:invert'>
-         <span class='sr-only'>Loading...</span>
-          <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
-        <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
-        <div class='h-8 w-8 bg-black rounded-full animate-bounce'></div>
-    </div>
+          <div class='flex space-x-2 justify-center items-center bg-white h-screen dark:invert'>
+            <span class='sr-only'>Loading...</span>
+            <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+            <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+            <div class='h-8 w-8 bg-black rounded-full animate-bounce'></div>
+          </div>
         ) : (
           <div class="bg-white p-8 rounded-md w-full py-24 ">
             <div class=" flex items-center justify-between pb-6">
@@ -108,69 +92,42 @@ const Orders = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {orders.map((order) => (
-                          <React.Fragment key={order._id}>
-                            {/* Iterate through products in the order */}
-                            {order.products &&
-                              Object.values(order.products).map((product) => (
-                                <tr key={product._id}>
-                                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <div className="flex items-center">
-                                      {/* Display product image */}
-                                      <div className="flex-shrink-0 w-10 h-10">
-                                        {product.frontImage && (
-                                          <img
-                                            className="w-full h-full rounded-full"
-                                            src={product.frontImage}
-                                            alt=""
-                                          />
-                                        )}
-                                      </div>
-                                      {/* Display product name */}
-                                      <div className="ml-3">
-                                        {product.name && (
-                                          <p className="text-black whitespace-no-wrap">
-                                            {product.name}
-                                          </p>
-                                        )}
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <p className="text-black whitespace-no-wrap">
-                                      {order.email}
-                                    </p>
-                                  </td>
-                                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <p className="text-black whitespace-no-wrap">
-                                      #{order.orderId}
-                                    </p>
-                                  </td>
-                                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <p className="text-black whitespace-no-wrap">
-                                      ₹{order.amount}
-                                    </p>
-                                  </td>
-                                  <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                    <Link
-                                      href={`/order?id=${order._id}`}
-                                      legacyBehavior
-                                    >
-                                      <span className="relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                        <span
-                                          aria-hidden
-                                          className="absolute inset-0 bg-green-200 opacity-50 rounded-full"
-                                        ></span>
-                                        <span className="relative">
-                                          Details
-                                        </span>
-                                      </span>
-                                    </Link>
-                                  </td>
-                                  {/* Other table columns */}
-                                </tr>
-                              ))}
-                          </React.Fragment>
+                        {orders.map((order, index) => (
+                          <tr key={index}>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                             
+                            {Object.keys(order.cart).map((key) => {
+                            const product = order.cart[key];
+                            return (
+                              <div key={key} className="flex items-center">
+                              <img  src={product.frontImage}
+                    alt={product.name} className="w-10 h-10 mr-2 rounded-sm" />
+                              <span>{product.name}</span>
+                            </div>
+                            );
+                          })}
+                     
+            </td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{order.email}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{order.oid}</td>
+                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">{order.subTotal}</td>
+                            <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+                              <Link
+                                href={`/order?id=${order.id}`}
+                                legacyBehavior
+                              >
+                                <span className="relative cursor-pointer inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
+                                  <span
+                                    aria-hidden
+                                    className="absolute inset-0 bg-green-200 opacity-50 rounded-full"
+                                  ></span>
+                                  <span className="relative">
+                                    Details
+                                  </span>
+                                </span>
+                              </Link>
+                            </td>
+                          </tr>
                         ))}
                       </tbody>
                     </table>

@@ -303,7 +303,7 @@ const ProductDetails = ({ bookNow, addToCart,cart }) => {
           <hr class="my-8" />
           <div class="flex flex-wrap gap-4 items-start">
             <div>
-              <p class="text-gray-800 text-3xl font-bold">₹{productdata.price}</p>
+              <p class="text-gray-800 text-3xl font-bold">${productdata.price}</p>
               {/* <p class="text-gray-400 text-xl mt-1"><strike>$42</strike> <span class="text-sm ml-1">Tax included</span></p> */}
             </div>
             <div class="flex flex-wrap gap-4">

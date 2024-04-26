@@ -109,79 +109,67 @@ const Checkout = ({ cart, clearCart, subTotal, dateRange,setSubTotal }) => {
     }
   };
 
-  const loadScript = async (src) => {
-    try {
-        await new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = src;
-            script.onload = resolve;
-            script.onerror = reject;
-            document.body.appendChild(script);
-        });
-        return true;
-    } catch (error) {
-        console.error('Error loading script:', error);
-        toast.error('Failed to load Razorpay SDK. Please try again later.');
-        return false;
-    }
-};
-
-
-
-const initiatePayment = async () => {
-  try {
+  const initiatePayment = async () => {
     setIsLoading(true);
-
     let oid = Math.floor(Math.random() * Date.now());
-  
-    const data = { cart, subTotal, oid, email, name, address, phone };
-    
-    // Display payment modal
-    const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js');
-    if (!res) {
-      toast.error('Failed to load Razorpay SDK. Please try again later.');
-      return;
+
+    // Get a transaction token
+    const data = { cart, subTotal, oid, email: email, name, address, phone };
+    let a = await fetch(`${process.env.NEXT_PUBLIC_HOST}/api/pretransaction`, {
+      method: "POST", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    });
+    let txnRes = await a.json();
+    if (txnRes.success) {
+      //console.log(txnRes)
+      let txnToken = txnRes.txnToken;
+
+      var config = {
+        root: "",
+        flow: "DEFAULT",
+        data: {
+          orderId: oid /* update order id */,
+          token: txnToken /* update token value */,
+          tokenType: "TXN_TOKEN",
+          amount: subTotal /* update amount */,
+        },
+        handler: {
+          notifyMerchant: function (eventName, data) {
+            console.log("notifyMerchant handler function called");
+            console.log("eventName => ", eventName);
+            console.log("data => ", data);
+          },
+        },
+      };
+
+      window.Paytm.CheckoutJS.init(config)
+        .then(function onSuccess() {
+          // after successfully updating configuration, invoke JS Checkout
+          window.Paytm.CheckoutJS.invoke();
+          setIsLoading(false);
+        })
+        .catch(function onError(error) {
+          setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
+      if (txnRes.cartClear) {
+        clearCart();
+      }
+      toast.error(txnRes.error, {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
-
-    const amountInPaise = subTotal * 100;
-
-    const options = {
-      key: 'rzp_test_td8CxckGpxFssp', // Replace 'YOUR_RAZORPAY_KEY' with your actual Razorpay API key
-      currency: 'INR',
-      amount: amountInPaise,
-      name: 'Games',
-      description: 'Thanks for purchasing',
-      image: 'logo.png',
-      handler: async function (response) {
-        try {
-          // Handle payment success
-          const docRef = await firebase.firestore().collection("orders").add(data);
-          console.log('Payment Successful:', response);
-          console.log("id",docRef.id)
-          toast.success('Payment Successful!');
-          router.push(`/order?id=${docRef.id}`); // Redirect to confirmation page with Firebase document ID
-        } catch (error) {
-          console.error('Error handling payment success:', error);
-          toast.error('Failed to handle payment. Please contact support.');
-        }
-      },
-      prefill: {
-        name: `${name}`,
-        email: email,
-      },
-    };
-
-    const paymentObject = new window.Razorpay(options);
-    paymentObject.open();
-  } catch (error) {
-    console.error('Error initiating payment:', error);
-    toast.error('Failed to initiate payment. Please try again later.');
-  } finally {
-    setIsLoading(false);
-  }
-};
-
- 
+  };
 
  
   
@@ -202,7 +190,11 @@ const initiatePayment = async () => {
           pauseOnHover
         />
 
-      
+        <Script
+          type="application/javascript"
+          crossorigin="anonymous"
+          src={`${process.env.NEXT_PUBLIC_PAYTM_HOST}/merchantpgpui/checkoutjs/merchants/${process.env.NEXT_PUBLIC_PAYTM_MID}.js`}
+        />
         <div class="grid py-12  grid-cols-10">
           <div class="col-span-full py-6 px-4 sm:py-12 lg:col-span-6 lg:py-24">
             <div class="mx-auto w-full max-w-lg">
@@ -306,7 +298,7 @@ const initiatePayment = async () => {
                     onClick={initiatePayment}
                     class="mt-4 inline-flex w-full items-center justify-center rounded bg-red-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-red-600 sm:text-lg"
                   >
-                    Make Payment ₹{subTotal}
+                    Make Payment ${subTotal}
                   </button>
                 </Link>
               )}
@@ -333,7 +325,7 @@ const initiatePayment = async () => {
             {cart[k].name}
           </span>
           <p className="text-lg font-bold text-center">
-            ₹ {cart[k].price}
+            $ {cart[k].price}
           </p>
           
         </div>

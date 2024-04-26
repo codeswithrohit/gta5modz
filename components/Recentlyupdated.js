@@ -22,7 +22,7 @@ const RecentlyUpdated = ({ Productdata,addToCart }) => {
             <p className="text-gray-400 font-light text-xs text-center">
               {Product.name}
             </p>
-            <p className="text-center text-gray-800 mt-1">₹{Product.price}</p>
+            <p className="text-center text-gray-800 mt-1">${Product.price}</p>
             <button onClick={() =>
     addToCart(
       Product.id, // Pass productdata.id as itemCode

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FaFacebookF, FaTwitter, FaInstagram, FaEnvelope, FaPinterest, FaLinkedinIn, FaChartBar, FaHome, FaCube, FaTags, FaMoneyBillAlt, FaEllipsisH, FaInfoCircle } from 'react-icons/fa';
+import { FaFacebookF, FaTwitter, FaInstagram, FaEnvelope, FaPinterest, FaLinkedinIn, FaChartBar, FaHome, FaCube, FaTags, FaMoneyBillAlt, FaEllipsisH, FaInfoCircle,FaUserCircle } from 'react-icons/fa';
 import { useRouter } from 'next/router';
 import { firebase } from '../Firebase/config';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
@@ -8,9 +8,9 @@ import Link from "next/link";
 import { FaUser, FaShoppingCart } from "react-icons/fa"; // Import the cart icon
 
 
-const SubmenuNavItem = ({ title, Icon }) => (
+const SubmenuNavItem = ({ title, Icon,path }) => (
     <li className="py-1 border-b-2 border-transparent">
-        <a href="javascript:void(0)" className="flex items-center justify-start uppercase py-2 px-3 rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-100 duration-150">
+        <a href={path} className="flex items-center justify-start uppercase py-2 px-3 rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-100 duration-150">
             <Icon className="mr-2" />
             {title}
         </a>
@@ -27,7 +27,7 @@ export default ({user,userData, addToCart, cart, removeFromCart, clearCart, subT
     ];
     
     const submenuNav = [
-        { title: "Membership", Icon: FaChartBar },
+        { title: "Membership", Icon: FaChartBar,path: "/subscription" },
         { title: "Home", Icon: FaHome },
         { title: "All Mods", Icon: FaCube },
         { title: "Bundle", Icon: FaTags },
@@ -172,7 +172,7 @@ const handleCheckout = () => {
                                   );
                                 }} class="bg-gray-200 rounded-r-lg px-2 py-1" >+</button>
                     </div>
-                    <span class="ml-auto font-bold">₹{cart[k].price}</span>
+                    <span class="ml-auto font-bold">${cart[k].price}</span>
                 </div>
             </div>
         </div>
@@ -181,7 +181,7 @@ const handleCheckout = () => {
     </div>
     <div class="flex justify-end items-center mt-8">
         <span class="text-gray-600 mr-4">Subtotal:</span>
-        <span class="text-xl font-bold">₹{subTotal}</span>
+        <span class="text-xl font-bold">${subTotal}</span>
     </div>
 </div>
           </div>
@@ -262,6 +262,7 @@ const handleCheckout = () => {
                           )}
                         </span>
                         {userData.username}
+                        <span>{userData.member}</span>
                       </a>
                     </div>
 
@@ -433,7 +434,9 @@ const handleCheckout = () => {
                                 )}
                               </span>
                               {userData.username}
+                           
                             </a>
+                            <h4 className="text-center text-xs font-bold" >{userData.member}</h4>
                           </div>
   
                           <div className="py-1" role="none">
@@ -517,7 +520,7 @@ const handleCheckout = () => {
                 <nav className="border-b">
                     <ul className="flex items-center gap-x-3 max-w-screen-xl mx-auto px-4 overflow-x-auto lg:px-8">
                         {submenuNav.map((item, idx) => (
-                            <SubmenuNavItem key={idx} title={item.title} Icon={item.Icon} />
+                            <SubmenuNavItem key={idx} title={item.title} path={item.path} Icon={item.Icon} />
                         ))}
                     </ul>
                 </nav>

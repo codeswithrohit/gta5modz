@@ -76,6 +76,7 @@ const Signup = () => {
         firstName,
         lastName,
         phoneNumber,
+        member:"No Member"
       });
   
       setIsLoading(false);

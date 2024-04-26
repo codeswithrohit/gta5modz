@@ -1,17 +1,38 @@
-import React, { useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
-import Head from "next/head";
-import Order from "../models/Order";
-import mongoose from "mongoose";
-import Link from "next/link";
-const OrderConfirmation = ({ order }) => {
-  const products = order.products;
+import { firebase } from '../Firebase/config';
+
+const db = firebase.firestore();
+const OrderConfirmation = () => {
   const router = useRouter();
+  const [bookingData, setBookingData] = useState(null);
+
   useEffect(() => {
-    if (router.query.cleaCart == 1) {
-      clearCart();
+    const { id } = router.query;
+    if (id) {
+      const fetchData = async () => {
+        try {
+          const doc = await db.collection('orders').doc(id).get();
+          if (doc.exists) {
+            setBookingData(doc.data());
+          } else {
+            console.log('No such document!');
+          }
+        } catch (error) {
+          console.error('Error fetching document:', error);
+        }
+      };
+      fetchData();
     }
-  });
+  }, [router.query]);
+
+  useEffect(() => {
+    // Log booking data when it changes
+    if (bookingData) {
+      console.log("booking", bookingData);
+    }
+  }, [bookingData]);
+
   const formatDate = (dateString) => {
     const options = {
       year: "numeric",
@@ -24,74 +45,56 @@ const OrderConfirmation = ({ order }) => {
   };
 
   return (
-    <div>
-      <div className="py-12 px-6 lg:px-12 xl:px-24 mx-auto">
-        <div className="bg-white rounded-lg shadow-md p-8">
-          <h1 className="text-4xl font-semibold text-black mb-6">
-            Order Placed Successfully
-          </h1>
+    <div className="bg-white " >
+      {bookingData && (
+        <div className="py-12 px-6 lg:px-12 xl:px-24 mx-auto">
+          <div className="bg-white rounded-lg shadow-md p-8">
+            <h1 className="text-4xl font-semibold text-black mb-6">
+              Order Placed Successfully
+            </h1>
 
-          <div className="mb-8">
-            <p className="text-lg text-black">Order ID: #{order.orderId}</p>
-            <p className="text-base text-black">
-              Ordered on {formatDate(order.createdAt)}
-            </p>
-          </div>
+            <div className="mb-8">
+              <p className="text-lg text-black">Order ID: #{bookingData.oid}</p>
+              {/* <p className="text-base text-black">
+                Ordered on {formatDate(bookingData.createdAt)}
+              </p> */}
+            </div>
 
-          <div className="mb-8">
-            {Object.keys(products).map((key) => {
-              return (
-                <div key={key} className="flex items-center mb-4">
-                  <img
-                    src={products[key].frontImage}
-                    alt={products[key].name}
-                    className="w-16 h-16 mr-4 rounded-md"
-                  />
-                  <div>
-                    <p className="text-lg text-black">
-                      {products[key].name}
-                    </p>
-                    {!(products[key].qty && products[key].selectedDate) && (
+            <div className="mb-8">
+              {Object.keys(bookingData.cart).map((key) => {
+                const product = bookingData.cart[key];
+                return (
+                  <div key={key} className="flex items-center mb-4">
+                    <img
+                      src={product.frontImage}
+                      alt={product.name}
+                      className="w-16 h-16 mr-4 rounded-md"
+                    />
+                    <div>
+                      <p className="text-lg text-black">{product.name}</p>
                       <p className="text-sm text-black">
-                        {products[key].qty} x ₹{products[key].price}
+                        {product.qty} x ${product.price}
                       </p>
-                    )}
-                  
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
 
-          <div className="mb-8">
-            <p className="text-lg text-black">Total: ₹{order.amount}</p>
-          </div>
-         
+            <div className="mb-8">
+              <p className="text-lg text-black">Total: ${bookingData.subTotal}</p>
+            </div>
 
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-8">
-            <p className="text-sm">
-              Thank you for your order! We'll process it shortly.
-            </p>
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-md mb-8">
+              <p className="text-sm">
+                Thank you for your order! We'll process it shortly.
+              </p>
+            </div>
           </div>
-        
         </div>
-      </div>
+      )}
     </div>
   );
 };
-
-export async function getServerSideProps(context) {
-  if (!mongoose.connections[0].readyState) {
-    await mongoose.connect(process.env.MONGO_URI);
-  }
-
-  const order = await Order.findById(context.query.id);
-
-  return {
-    props: {
-      order: JSON.parse(JSON.stringify(order)),
-    },
-  };
-}
 
 export default OrderConfirmation;
