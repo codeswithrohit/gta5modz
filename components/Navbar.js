@@ -8,14 +8,24 @@ import Link from "next/link";
 import { FaUser, FaShoppingCart } from "react-icons/fa"; // Import the cart icon
 
 
-const SubmenuNavItem = ({ title, Icon,path }) => (
-    <li className="py-1 border-b-2 border-transparent">
-        <a href={path} className="flex items-center justify-start uppercase py-2 px-3 rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-100 duration-150">
-            <Icon className="mr-2" />
-            {title}
-        </a>
+const SubmenuNavItem = ({ title, Icon, path }) => {
+  const router = useRouter();
+  const [isActive, setIsActive] = useState(false);
+
+  useEffect(() => {
+    setIsActive(router.pathname === path);
+  }, [router.pathname, path]);
+
+  return (
+    <li className={`py-1 border-b-2 ${isActive ? 'border-indigo-600' : 'border-transparent'}`}>
+      <a href={path} className="flex items-center justify-start uppercase py-2 px-3 rounded-lg text-gray-700 hover:text-gray-900 hover:bg-gray-100 duration-150 text-xs ">
+        <Icon className="mr-2" />
+        {title}
+      </a>
     </li>
-);
+  );
+};
+
 
 export default ({user,userData, addToCart, cart, removeFromCart, clearCart, subTotal,cartLength}) => {
   const router = useRouter();
@@ -28,12 +38,12 @@ export default ({user,userData, addToCart, cart, removeFromCart, clearCart, subT
     
     const submenuNav = [
         { title: "Membership", Icon: FaChartBar,path: "/subscription" },
-        { title: "Home", Icon: FaHome },
-        { title: "All Mods", Icon: FaCube },
-        { title: "Bundle", Icon: FaTags },
-        { title: "Paid Mod", Icon: FaMoneyBillAlt },
-        { title: "Miscellaneous", Icon: FaEllipsisH },
-        { title: "About Us", Icon: FaInfoCircle },
+        { title: "Home", Icon: FaHome,path: "/" },
+        { title: "All Mods", Icon: FaCube,path: "/allmods"  },
+        { title: "Bundle", Icon: FaTags,path: "/bundle"  },
+        { title: "Paid Mod", Icon: FaMoneyBillAlt,path: "/paidmod"  },
+        { title: "Miscellaneous", Icon: FaEllipsisH,path: "/miscellaneous"  },
+        { title: "About Us", Icon: FaInfoCircle,path: "/aboutus"  },
     ];
 
   //   const [user, setUser] = useState(null);
@@ -75,10 +85,7 @@ export default ({user,userData, addToCart, cart, removeFromCart, clearCart, subT
     // console.log("nav User",user,userData)
   const handleLogout = async () => {
     try {
-      setIsLoading(true); // Start the loading state
       const auth = getAuth();
-      await signOut(auth);
-      setIsLoading(false); // End the loading state
       toast.success('You have successfully logged out!', {
         position: 'top-center',
         autoClose: 3000,
@@ -121,7 +128,7 @@ const handleCheckout = () => {
           <div className="bg-white rounded-lg p-8 max-w-full w-full">
             <div className="flex justify-between items-center mb-4">
               <button onClick={handleCloseCartModal}>
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-6 h-6 text-gray-500 hover:text-gray-700">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-6 h-6 text-red-500 hover:text-red-700">
                   <path fillRule="evenodd" d="M10 11.414l-6.293 6.293a1 1 0 01-1.414-1.414L8.586 10 2.293 3.707a1 1 0 111.414-1.414L10 8.586l6.293-6.293a1 1 0 111.414 1.414L11.414 10l6.293 6.293a1 1 0 11-1.414 1.414L10 11.414z" clipRule="evenodd" />
                 </svg>
               </button>
@@ -130,7 +137,7 @@ const handleCheckout = () => {
     <div class="flex flex-col md:flex-row md:justify-between md:items-center">
         <h1 class="text-2xl font-bold my-4">Shopping Cart</h1>
         
-                <button onClick={handleCheckout} class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">
+                <button onClick={handleCheckout} class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
                   Checkout
                 </button>
            
@@ -187,7 +194,7 @@ const handleCheckout = () => {
           </div>
         </div>
       )}
-            <div className="hidden lg:block px relative z-40 ">
+            <div className="hidden bg-gray-500 lg:block px relative z-40 px-4 ">
                 <section className="py-1 bg-gray-500 px-10 flex justify-between">
                     <div className="flex flex-row">
                         <a href="#"><FaFacebookF className="mx-2 text-white" /></a>
@@ -203,7 +210,7 @@ const handleCheckout = () => {
                             Credits are renewed every day at 8:00 (UTC)</p>
                     </div>
                     <div>
-                        <button className="px-4 py-2 bg-[#007bff] text-white rounded uppercase hover:bg-[#0056b3]">Download Everything for free! become co-owner of our team</button>
+                        <button className="px-1 py-1 text-xs ml-4 font-bold bg-gray-800 text-white rounded uppercase hover:bg-gray-500">Unlock Gold Member Access!</button>
                     </div>
                 </section>
             </div>
@@ -247,7 +254,7 @@ const handleCheckout = () => {
                         Signed in as:
                       </p>
                       <a
-                        href="#"
+                        href="/Profile"
                         className="flex px-4 py-2 text-sm font-semibold text-black border-l-2 border-transparent hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600 dark:hover:text-red-600"
                       >
                         <span className="mr-2">
@@ -258,7 +265,7 @@ const handleCheckout = () => {
                               className="w-4 h-4 rounded-full cursor-pointer"
                             />
                           ) : (
-                            <FaUser className="w-4 h-4 text-black cursor-pointer" />
+                            <FaUser className="w-2 h-2 md:w-4 md:h-4 text-black cursor-pointer" />
                           )}
                         </span>
                         {userData.username}
@@ -268,7 +275,7 @@ const handleCheckout = () => {
 
                     <div className="py-1" role="none">
                       <a
-                        href="/rders"
+                        href="/orders"
                         className="flex px-4 py-2 text-sm text-black border-l-2 border-transparent dark:hover:border-red-600 rounded-bl-md hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600"
                       >
                         <span className="mr-2">
@@ -363,7 +370,7 @@ const handleCheckout = () => {
                     <div className={`nav-menu flex-1 pb-28 mt-8 overflow-y-auto max-h-screen lg:block lg:overflow-visible lg:pb-0 lg:mt-0 ${state ? "" : "hidden"}`}>
                         <ul className="items-center space-y-6 lg:flex lg:space-x-6 lg:space-y-0">
                             <form onSubmit={(e) => e.preventDefault()} className='flex-1 items-center justify-start pb-4 lg:flex lg:pb-0'>
-                                <div className="flex items-center gap-1 px-2 border rounded-lg">
+                                <div className="flex w-96 items-center gap-1 px-2 border rounded-lg">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                     </svg>
@@ -376,7 +383,7 @@ const handleCheckout = () => {
                             </form>
                             {navigation.map((item, idx) => (
                                 <li key={idx}>
-                                    <a href={item.path} className="block text-black hover:text-black py-2 px-4 rounded-md bg-gray-200 hover:bg-white">
+                                    <a href={item.path} className="block text-black hover:text-black py-2 px-4 rounded-md bg-gray-200 hover:bg-gray-800 hover:text-white">
                                         {item.title}
                                     </a>
                                 </li>
@@ -419,7 +426,7 @@ const handleCheckout = () => {
                               Signed in as:
                             </p>
                             <a
-                              href="#"
+                              href="/Profile"
                               className="flex px-4 py-2 text-sm font-semibold text-black border-l-2 border-transparent hover:border-red-600 dark:text-black dark:hover:text-black hover:text-red-600 dark:hover:text-red-600"
                             >
                               <span className="mr-2">
@@ -430,7 +437,7 @@ const handleCheckout = () => {
                                     className="w-4 h-4 rounded-full cursor-pointer"
                                   />
                                 ) : (
-                                  <FaUser className="w-4 h-4 text-black cursor-pointer" />
+                                  <FaUser className="w-2 h-2 md:w-4 md:h-4  text-black cursor-pointer" />
                                 )}
                               </span>
                               {userData.username}
@@ -508,7 +515,7 @@ const handleCheckout = () => {
        </div>
     ) : (
       <Link href="/login">
-        <div className="block text-black hover:text-black py-2 px-4 rounded-md bg-gray-200 hover:bg-white">Login/Register</div>
+        <div className="block text-black hover:text-black py-2 px-4 rounded-md bg-gray-200 hover:bg-gray-800 hover:text-white">Login/Register</div>
       </Link>
     )}
   </div>

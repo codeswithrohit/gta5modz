@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import AdminNavbar from "@/components/AdminNavbar";
 import { FiTrash2, FiEdit, FiStar } from "react-icons/fi"
 const db = firebase.firestore();
-const Product = () => {
+const Paidmod = () => {
   const router = useRouter(); 
 
   const [isAdmin, setIsAdmin] = useState(false);
@@ -30,9 +30,7 @@ const Product = () => {
   const [formData, setFormData] = useState({
     name: "",
     price: "",
-    category: "",
     description: "",
-    MemberType: "",
     frontImage: "",
     zipfile: "",
   });
@@ -92,7 +90,7 @@ const Product = () => {
       }
 
       const dataToUpload = { ...formData, frontImage: frontImageUrl, zipfile: zipfileurl };
-      await db.collection("Product").add(dataToUpload);
+      await db.collection("Paidmod").add(dataToUpload);
       toast.success("Data uploaded successfully!");
       router.reload();
     } catch (error) {
@@ -111,7 +109,7 @@ console.log("editproduct",editedProduct)
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(() => {
       const db = firebase.firestore();
-      const ProductsRef = db.collection("Product");
+      const ProductsRef = db.collection("Paidmod");
 
       ProductsRef.get()
         .then((querySnapshot) => {
@@ -219,15 +217,13 @@ console.log("editproduct",editedProduct)
     try {
       if (editedProduct) {
         const db = firebase.firestore();
-        const ProductRef = db.collection("Product").doc(editedProduct.id);
+        const ProductRef = db.collection("Paidmod").doc(editedProduct.id);
         await ProductRef.update({
           name: editedProduct.name,
           price: editedProduct.price,
-          category: editedProduct.category,
           description: editedProduct.description,
           frontImage: editedProduct.frontImage,
           zipfile: editedProduct.zipfile,
-          MemberType: editedProduct.MemberType,
         });
         setShowPopup(false);
         setEditedProduct(null);
@@ -260,7 +256,7 @@ console.log("editproduct",editedProduct)
   const handleDelete = async (id) => {
     try {
       const db = firebase.firestore();
-      await db.collection("Product").doc(id).delete();
+      await db.collection("Paidmod").doc(id).delete();
       const updatedData = Productdata.filter((item) => item.id !== id);
       setProductData(updatedData);
       toast.success("Deletion successful!", {
@@ -284,7 +280,7 @@ console.log("editproduct",editedProduct)
 // Function to handle showing reviews for a specific Product item
 const handleShowReviews = async (selectedItemId) => {
   try {
-    const ProductRef = db.collection("Product").doc(selectedItemId);
+    const ProductRef = db.collection("Paidmod").doc(selectedItemId);
     const ProductDoc = await ProductRef.get();
 
     if (ProductDoc.exists) {
@@ -320,7 +316,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
       throw new Error("No selected Product found");
     }
 
-    const ProductRef = db.collection("Product").doc(selectedEditedId);
+    const ProductRef = db.collection("Paidmod").doc(selectedEditedId);
     const ProductDoc = await ProductRef.get();
 
     if (!ProductDoc.exists) {
@@ -373,7 +369,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
     <div className="m-auto min-h-screen bg-white dark:bg-gray-900">
       <AdminNavbar/>
       <section className="bg-white lg:ml-64  dark:bg-gray-900">
-      <h1 className="text-xl text-red-600 text-center font-bold" >Our Products</h1>
+      <h1 className="text-xl text-red-600 text-center font-bold" >Paid Mod Product</h1>
         <div className="container px-6 py-10 mx-auto">
           {showAllInputFormats ? (
             <div>
@@ -438,7 +434,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
                   </div>
                  
                 </div>
-                <div className="grid grid-cols-2 gap-4 mb-4">
+                {/* <div className="grid grid-cols-2 gap-4 mb-4">
                
                 <div>
   <select
@@ -471,7 +467,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
 </div>
 
                  
-                </div>
+                </div> */}
 
                 <div className="flex flex-wrap -mx-3 mb-6">
                   <div className="w-full px-3">
@@ -529,12 +525,12 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">
           Price
         </th>
-        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">
+        {/* <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">
          Category
         </th>
         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">
           Member
-        </th>
+        </th> */}
         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">
           Actions
         </th>
@@ -552,12 +548,12 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
         <td class="px-6 py-4 text-base">
         {Product.price}
         </td>
-        <td class="px-6 py-4 text-base">
+        {/* <td class="px-6 py-4 text-base">
         {Product.category}
         </td>
         <td class="px-6 py-4 text-base">
         {Product.MemberType}
-        </td>
+        </td> */}
         <td class="px-6 py-4">
           <button   onClick={() => handleEditDetails(Product)} class="mr-4" title="Edit">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 fill-blue-500 hover:fill-blue-700"
@@ -799,7 +795,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
                 </div>
                 
              
-         
+{/*          
                 <div>
   <label htmlFor="MemberType" className="block text-sm font-medium text-black">
    MemberType Product
@@ -844,7 +840,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
     <option value="BEST SELLING MODS">BEST SELLING MODS</option>
     <option value="TOP RATED MODS">TOP RATED MODS</option>
   </select>
-</div>
+</div> */}
 
                 
                 {/* Add more fields here for editing */}
@@ -898,4 +894,4 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
   );
 };
 
-export default Product;
+export default Paidmod;

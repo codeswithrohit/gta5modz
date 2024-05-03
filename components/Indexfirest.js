@@ -9,7 +9,7 @@ const Indexfirest = () => {
   <hr className='border-t border-yellow-500 flex-grow' />
 </div>
 
-<div class="max-w-6xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14 mx-auto">
+<div class="max-w-6xl px-4 py-8 sm:px-6 lg:px-8 lg:py-12 mx-auto">
   <div class="grid sm:grid-cols-12 gap-6">
   
    

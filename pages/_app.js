@@ -56,7 +56,9 @@ function MyApp({ Component, pageProps }) {
       console.error("Error fetching user data:", error);
     }
   };
-console.log("userdata",userData)
+
+  const membertype = userData ? userData.member : null;
+
   useEffect(() => {
     router.events.on("routeChangeStart", () => {
       // Do something on route change start
@@ -195,8 +197,32 @@ console.log("userdata",userData)
         {/* Meta tags, title, favicon, and other head elements */}
       </Head>
       
-      {showNavbarFooter && (
-        <Navbar
+      {isLoading ? (
+      <div className='flex space-x-2 justify-center items-center bg-white h-screen dark:invert'>
+        <span className='sr-only'>Loading...</span>
+        <div className='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+        <div className='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+        <div className='h-8 w-8 bg-black rounded-full animate-bounce'></div>
+      </div>
+    ) : (
+      <Fragment>
+        {showNavbarFooter && (
+          <Navbar
+            bookNow={bookNow}
+            cart={cart}
+            cartLength={cartLength}
+            addToCart={addToCart}
+            removeFromCart={removeFromCart}
+            clearCart={clearCart}
+            subTotal={subTotal}
+            setSubTotal={setSubTotal}
+            userData={userData}
+            user={user}
+            Productdata={Productdata}
+            membertype={membertype}
+          />
+        )}
+        <Component
           bookNow={bookNow}
           cart={cart}
           cartLength={cartLength}
@@ -204,27 +230,16 @@ console.log("userdata",userData)
           removeFromCart={removeFromCart}
           clearCart={clearCart}
           subTotal={subTotal}
-          setSubTotal={setSubTotal}
           userData={userData}
           user={user}
+          setSubTotal={setSubTotal}
           Productdata={Productdata}
+          membertype={membertype}
+          {...pageProps}
         />
-      )}
-      <Component
-        bookNow={bookNow}
-        cart={cart}
-        cartLength={cartLength}
-        addToCart={addToCart}
-        removeFromCart={removeFromCart}
-        clearCart={clearCart}
-        subTotal={subTotal}
-        userData={userData}
-        user={user}
-        setSubTotal={setSubTotal}
-        Productdata={Productdata}
-        {...pageProps}
-      />
         {showNavbarFooter && <Footer />}
+      </Fragment>
+    )}
       {/* ToastContainer for displaying notifications */}
       <ToastContainer />
     </Fragment>

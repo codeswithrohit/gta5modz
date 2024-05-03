@@ -1,5 +1,6 @@
 import Footer from '@/components/Footer'
 import Gameproduct from '@/components/Gameproduct'
+import HomeCarousel from '@/components/HomeCarousel'
 import IndexTwo from '@/components/IndexTwo'
 import Indexfirest from '@/components/Indexfirest'
 import Navbar from '@/components/Navbar'
@@ -7,15 +8,16 @@ import Recentlyupdated from '@/components/Recentlyupdated'
 import Testimonial from '@/components/Testimonial'
 import React from 'react'
 
-const Index = ({Productdata,addToCart}) => {
-  console.log("home product",Productdata)
+const Index = ({Productdata,addToCart,membertype}) => {
+ 
   return (
     <div className='bg-white' >
-      <Indexfirest/>
-      <IndexTwo/>
-      <Recentlyupdated Productdata={Productdata} addToCart={addToCart} />
+      <HomeCarousel/>
+      {/* <Indexfirest/>
+      <IndexTwo/> */}
+      <Recentlyupdated Productdata={Productdata} addToCart={addToCart} membertype={membertype} />
       <Testimonial/>
-      <Gameproduct/>
+      <Gameproduct Productdata={Productdata} addToCart={addToCart} membertype={membertype}  />
     </div>
   )
 }

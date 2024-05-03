@@ -10,7 +10,7 @@ const Subscription = ({user,userData}) => {
   const plans = [
     {
       id: 1,
-      name: "DIAMOND MEMBER",
+      name: "SILVER MEMBER",
       img:"https://gta5modaz.com/wp-content/uploads/2021/08/silver-1.png",
       price: 34.95,
       duration: "MONTH",
@@ -26,7 +26,7 @@ const Subscription = ({user,userData}) => {
     },
     {
       id: 2,
-      name: "CO-OWNER MEMBER",
+      name: "GOLD MEMBER",
       img:"https://gta5modaz.com/wp-content/uploads/2021/08/exclusive.png",
       price: 699,
       duration: "ONE TIME PAYMENT",
@@ -273,43 +273,45 @@ const Subscription = ({user,userData}) => {
 
 
   return (
-    <div className='bg-white'>
-      <main className="max-w-6xl mx-auto pt-10 pb-36 px-8">
-        <div className="max-w-md mx-auto mb-14 text-center">
-          <h1 className="text-4xl font-semibold mb-6 lg:text-5xl"><span className="text-indigo-600">Flexible</span> Plans</h1>
-          <p className="text-xl text-gray-500 font-medium">Choose a plan that works best for you and your team.</p>
-        </div>
-
-        <div className="flex flex-col justify-between items-center lg:flex-row lg:items-start">
-          {plans.map(plan => (
-            <div key={plan.id} className="w-full flex-1 mt-8 p-8 order-2 bg-white shadow-xl rounded-3xl sm:w-96 lg:w-full lg:order-1 lg:rounded-r-none transition-transform duration-300 transform hover:scale-105">
-              <div className="mb-7 pb-7 flex items-center border-b border-gray-300">
-                <img src={plan.img} alt="" className="rounded-3xl w-20 h-20" />
-                <div className="ml-5">
-                  <span className="block text-xl font-bold">{plan.name}</span>
-                  <span><span className="font-medium text-gray-500 text-xl align-top">$&thinsp;</span><span className="text-3xl font-bold">{plan.price} </span></span><span className="text-gray-500 font-medium">/ {plan.duration}</span>
-                  <span className="block text-xs font-bold text-yellow-500">Your support help us keep the website up and running, help our TEAM work</span>
-                </div>
+    <div className='bg-white min-h-screen'>
+    <main className="max-w-6xl mx-auto p-12">
+      <div className="max-w-md mx-auto mb-14 text-center">
+        <h1 className="text-4xl font-semibold mb-6 lg:text-5xl"><span className="text-gray-800">Flexible</span> Plans</h1>
+        <p className="text-xl text-gray-500 font-medium">Choose a plan that works best for you and your team.</p>
+      </div>
+  
+      <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {plans.map(plan => (
+          <div key={plan.id} className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition duration-300">
+            <div className="p-6">
+              <img src={plan.img} alt="" className="w-24 h-24 mx-auto mb-6 rounded-full" />
+              <h2 className="text-xl font-bold text-center mb-4">{plan.name}</h2>
+              <div className="text-center mb-4">
+                <span className="text-gray-500 text-lg align-top">$&thinsp;</span>
+                <span className="text-2xl font-bold">{plan.price}</span>
+                <span className="text-gray-500 font-medium">/ {plan.duration}</span>
               </div>
-              <ul className="mb-7 font-medium text-gray-500">
+              <p className="text-sm text-gray-600 mb-6">{plan.description}</p>
+              <ul className="text-sm text-gray-600 mb-6">
                 {plan.features.map((feature, index) => (
-                  <li key={index} className="flex text-lg mb-2">
-                    <img src={"https://res.cloudinary.com/williamsondesign/check-grey.svg"} alt="check mark" />
-                    <span className="ml-3">{feature}</span>
+                  <li key={index} className="flex items-center">
+                   
+                    <span>✅ {feature}</span>
                   </li>
                 ))}
               </ul>
-              <button onClick={() => openPopup(plan)} className="flex justify-center items-center bg-indigo-600 rounded-xl py-5 px-4 text-center text-white text-xl">
-                Choose Plan
-                <img src="https://res.cloudinary.com/williamsondesign/arrow-right.svg" alt="arrow" className="ml-2" />
+              <button onClick={() => openPopup(plan)} className="block w-full bg-gray-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 focus:outline-none focus:bg-indigo-700">
+                Subscribe
               </button>
             </div>
-          ))}
-        </div>
-      </main>
-      <ToastContainer/>
-      {showPopup && <PlanPopup plan={selectedPlan} />}
-    </div>
+          </div>
+        ))}
+      </div>
+    </main>
+    <ToastContainer/>
+    {showPopup && <PlanPopup plan={selectedPlan} />}
+  </div>
+  
   );
 };
 

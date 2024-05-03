@@ -1,179 +1,174 @@
-import React, { useState } from "react";
-import { FiHome, FiGrid } from "react-icons/fi";
 
-export default function AdminNavbar() {
+import { GiHamburgerMenu } from "react-icons/gi";
+import { Disclosure } from "@headlessui/react";
+import {
+  MdOutlineSpaceDashboard,
+  MdOutlineAnalytics,
+  MdOutlineIntegrationInstructions,
+  MdOutlineMoreHoriz,
+  MdOutlineSettings,
+  MdOutlineLogout,
+} from "react-icons/md";
+import { CgProfile } from "react-icons/cg";
+import { FaRegComments,FaFileContract } from "react-icons/fa";
+import { IoIosAddCircle } from "react-icons/io";
+import { BiMessageSquareDots } from "react-icons/bi";
+import React, { useState } from "react";
+import Link from "next/link";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+/* Install pure-react-carousel using -> npm i pure-react-carousel */
+import { firebase } from "../Firebase/config";
+import { useRouter } from "next/router";
+function SideNavbar() {
   const [show, setShow] = useState(true);
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      
+      // Sign out the user
+      await firebase.auth().signOut();
+
+      // Redirect to the login page after logout
+      router.push("/Admin/adminlogin"); // Replace '/login' with your login page route
+    } catch (error) {
+      console.error("Error logging out:", error.message);
+      toast.error(error.message);
+    }
+  };
+
+ 
 
   return (
     <div>
-      <div className="bg-[#4f6f52] rounded-r shadow xl:hidden flex justify-between w-full p-6 items-center border-b border-transparent sm:border-gray-200 ">
-        <button className="flex text-white hover:text-white font-bold focus:outline-none focus:text-white font-bold justify-between  items-center space-x-3">
-          <p className="text-2xl leading-6 ">GAME ADMIN</p>
-        </button>
-        <div aria-label="toggler" className="flex justify-center items-center">
-          <button
-            id="open"
-            aria-label="open"
-            onClick={() => setShow(!show)}
-            className={`${show ? "" : "hidden"} focus:outline-none focus:ring-2 `}
-          >
-            <svg
-              className="text-white font-bold"
-              width={24}
-              height={24}
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M4 6H20"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M4 12H20"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M4 18H20"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-          <button
-            id="close"
-            aria-label="close"
-            onClick={() => setShow(!show)}
-            className={`${show ? "hidden" : ""} focus:outline-none focus:ring-2  `}
-          >
-            <svg
-              className="text-white font-bold"
-              width={24}
-              height={24}
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M18 6L6 18"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              <path
-                d="M6 6L18 18"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </div>
-      </div>
+      <Disclosure as="nav">
+        <Disclosure.Button className="absolute top-4 right-4 inline-flex items-center peer justify-center rounded-md p-2 text-gray-800 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white group">
+          <GiHamburgerMenu
+            className="block md:hidden h-6 w-6"
+            aria-hidden="true"
+          />
+        </Disclosure.Button>
+        <div className="p-6 w-1/2 h-screen overflow-y-auto bg-white z-20 fixed top-0 -left-96 lg:left-0 lg:w-60  peer-focus:left-0 peer:transition ease-out delay-150 duration-200">
+          <div className="flex flex-col justify-start item-center">
+          <Link legacyBehavior href="/">
+            <img
+              src="https://ramkiayodhya-lswul.ondigitalocean.app/ramjilogo.png"
+              className="w-56 h-14 ml-2  "
+              alt="Logo"
+            />
+          </Link>
+            <div className=" my-4 border-b border-gray-100 pb-4">
+              <Link href='/Admin' className="flex mb-2 justify-start items-center gap-4 pl-5 hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
+                <MdOutlineSpaceDashboard className="text-2xl text-gray-600 group-hover:text-white " />
+                <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
+                  Dashboard
+                </h3>
+              </Link>
+              <Link href='/Admin/Users' className={`flex  mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer m-auto ${
+      router.pathname === '/Admin/Users' ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-gray-900'
+    }`}>
+      <CgProfile className={`text-2xl ${
+        router.pathname === '/Admin/Users' ? 'text-white' : 'text-gray-600 group-hover:text-white'
+      }`} />
+      <h3 className={`text-base ${
+        router.pathname === '/Admin/Users' ? 'text-white' : 'text-gray-800 group-hover:text-white'
+      } font-semibold`}>
+        Users
+      </h3>
+    </Link>
+             
 
-      <div
-        id="Main"
-        className={`${
-          show ? "-translate-x-full" : "translate-x-0"
-        } bg-[#4f6f52] transform  xl:translate-x-0 shadow xl:rounded-r fixed h-full top-22 sm:z-20 bg-white  ease-in-out transition duration-500 flex justify-start items-start w-full sm:w-64 flex-col `}
-      >
-        <button className="hidden focus:outline-none hover:text-white font-bold focus:text-white font-bold text-white sm:flex justify-start p-6 items-center space-x-3  w-full">
-          <p className="text-2xl leading-6 ">GAME ADMIN</p>
-        </button>
-        <button className="focus:outline-none focus:text-white  focus:bg-indigo-900 flex justify-between  sm:w-auto items-center space-x-10 text-white mx-6  p-3 rounded hover:bg-indigo-900 bg-indigo-800 ">
-          <div className="flex justify-start  sm:w-auto items-center space-x-2">
-            <div>
-              <img
-                src="https://i.ibb.co/G2sDV5X/Ellipse-2-4.png"
-                alt="avatar"
-              />
+              <Link href='/Admin/Product' className={`flex  mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer m-auto ${
+      router.pathname === '/Admin/Product' ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-gray-900'
+    }`}>
+      <IoIosAddCircle className={`text-2xl ${
+        router.pathname === '/Admin/Product' ? 'text-white' : 'text-gray-600 group-hover:text-white'
+      }`} />
+      <h3 className={`text-base ${
+        router.pathname === '/Admin/Product' ? 'text-white' : 'text-gray-800 group-hover:text-white'
+      } font-semibold`}>
+       Game Product
+      </h3>
+    </Link>
+
+              <Link href='/Admin/Paidmod' className={`flex  mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer m-auto ${
+      router.pathname === '/Admin/Paidmod' ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-gray-900'
+    }`}>
+      <IoIosAddCircle className={`text-2xl ${
+        router.pathname === '/Admin/Paidmod' ? 'text-white' : 'text-gray-600 group-hover:text-white'
+      }`} />
+      <h3 className={`text-base ${
+        router.pathname === '/Admin/Paidmod' ? 'text-white' : 'text-gray-800 group-hover:text-white'
+      } font-semibold`}>
+       Game Paid Mod
+      </h3>
+    </Link>
+             
+
+
+
+
+  
+   
+    <Link href='/Admin/AllOrders' className={`flex  mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer m-auto ${
+      router.pathname === '/Admin/AllOrders' ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-gray-900'
+    }`}>
+      <IoIosAddCircle className={`text-2xl ${
+        router.pathname === '/Admin/AllOrders' ? 'text-white' : 'text-gray-600 group-hover:text-white'
+      }`} />
+      <h3 className={`text-base ${
+        router.pathname === '/Admin/AllOrders' ? 'text-white' : 'text-gray-800 group-hover:text-white'
+      } font-semibold`}>
+            Orders
+      </h3>
+    </Link>
+    <Link href='/Admin/Subscription' className={`flex  mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer m-auto ${
+      router.pathname === '/Admin/Subscription' ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-gray-900'
+    }`}>
+      <IoIosAddCircle className={`text-2xl ${
+        router.pathname === '/Admin/Subscription' ? 'text-white' : 'text-gray-600 group-hover:text-white'
+      }`} />
+      <h3 className={`text-base ${
+        router.pathname === '/Admin/Subscription' ? 'text-white' : 'text-gray-800 group-hover:text-white'
+      } font-semibold`}>
+           Subscription
+      </h3>
+    </Link>
+ 
+    <Link href='/Admin/AddCoupan' className={`flex  mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer m-auto ${
+      router.pathname === '/Admin/AddCoupan' ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-gray-900'
+    }`}>
+      <IoIosAddCircle className={`text-2xl ${
+        router.pathname === '/Admin/AddCoupan' ? 'text-white' : 'text-gray-600 group-hover:text-white'
+      }`} />
+      <h3 className={`text-base ${
+        router.pathname === '/Admin/AddCoupan' ? 'text-white' : 'text-gray-800 group-hover:text-white'
+      } font-semibold`}>
+          Add Coupan
+      </h3>
+    </Link>
+   
+
+
             </div>
-            <div className="flex  flex-col justify-start space-y-1 items-center ">
-              <p className="text-base leading-4 text-white">Admin</p>
+            {/* setting  */}
+           
+            {/* logout */}
+            <div onClick={handleLogout} className=" my-4">
+              <div className="flex mb-2 justify-start items-center gap-4 pl-5 border border-gray-200  hover:bg-gray-900 p-2 rounded-md group cursor-pointer hover:shadow-lg m-auto">
+                <MdOutlineLogout className="text-2xl text-gray-600 group-hover:text-white " />
+                <h3 className="text-base text-gray-800 group-hover:text-white font-semibold ">
+                  Logout
+                </h3>
+              </div>
             </div>
-          </div>
-          <FiHome size={24} />
-        </button>
-        <div class="fixed flex flex-col top-0 left-0 w-64 bg-white h-full border-r">
-          <div class="flex items-center justify-center h-14 border-b">
-            <a
-              href="/"
-              className="flex-shrink-0 w-36 ml-2 h-12 inline-flex items-center justify-center"
-            >
-              <p className="text-md font-bold leading-6 ">GAME ADMIN</p>
-            </a>
-          </div>
-          <div class="overflow-y-auto overflow-x-hidden flex-grow">
-            <ul class="flex flex-col py-4 space-y-1">
-              <li>
-                <a
-                  href="/Admin"
-                  class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6"
-                >
-                  <span class="inline-flex justify-center items-center ml-4">
-                    <FiHome size={20} />
-                  </span>
-                  <span class="ml-2 text-sm tracking-wide truncate">Dashboard</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/Admin/Product"
-                  class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6"
-                >
-                  <span class="inline-flex justify-center items-center ml-4">
-                    <FiGrid size={20} />
-                  </span>
-                  <span class="ml-2 text-sm tracking-wide truncate">Add Product</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/Admin/AllOrders"
-                  class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6"
-                >
-                  <span class="inline-flex justify-center items-center ml-4">
-                    <FiGrid size={20} />
-                  </span>
-                  <span class="ml-2 text-sm tracking-wide truncate">Orders</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/Admin/Subscription"
-                  class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6"
-                >
-                  <span class="inline-flex justify-center items-center ml-4">
-                    <FiGrid size={20} />
-                  </span>
-                  <span class="ml-2 text-sm tracking-wide truncate">Subscription</span>
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/Admin/Users"
-                  class="relative flex flex-row items-center h-11 focus:outline-none hover:bg-gray-50 text-gray-600 hover:text-gray-800 border-l-4 border-transparent hover:border-indigo-500 pr-6"
-                >
-                  <span class="inline-flex justify-center items-center ml-4">
-                    <FiGrid size={20} />
-                  </span>
-                  <span class="ml-2 text-sm tracking-wide truncate">Users</span>
-                </a>
-              </li>
-            </ul>
           </div>
         </div>
-      </div>
+      </Disclosure>
+      <ToastContainer />
     </div>
   );
 }
+
+export default SideNavbar;

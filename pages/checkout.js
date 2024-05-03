@@ -181,7 +181,84 @@ const initiatePayment = async () => {
   }
 };
 
- 
+const [discountPrice, setDiscountPrice] = useState(0);
+const [couponCode, setCouponCode] = useState("");
+const [couponApplied, setCouponApplied] = useState(false);
+const [couponData, setCouponData] = useState([]);
+const [couponButtonDisabled, setCouponButtonDisabled] = useState(false); 
+useEffect(() => {
+  // Fetch coupon data from Firestore
+  const db = firebase.firestore();
+  const couponRef = db.collection("Coupan");
+
+  couponRef
+    .get()
+    .then((querySnapshot) => {
+      const coupons = [];
+      querySnapshot.forEach((doc) => {
+        coupons.push({ ...doc.data(), id: doc.id });
+      });
+
+      setCouponData(coupons);
+      setIsLoading(false);
+    })
+    .catch((error) => {
+      console.error("Error getting documents: ", error);
+      setIsLoading(false);
+    });
+}, []);
+
+console.log(couponData);
+
+// Function to handle applying the coupon code
+const applyCoupon = () => {
+  const matchedCoupon = couponData.find(
+    (coupon) => coupon.code.toUpperCase() === couponCode.toUpperCase()
+  );
+
+  if (matchedCoupon) {
+    const expiryDate = new Date(matchedCoupon.expirydate);
+
+    if (expiryDate > new Date()) {
+      const discount = parseFloat(matchedCoupon.price);
+      setDiscountPrice(discount);
+      const percentage = subTotal/discount
+      const discountAmount = subTotal - percentage;
+
+      console.log("Subtotal before discount:", subTotal);
+      console.log("Discount amount:", discount);
+      console.log("New Subtotal after discount:", discountAmount);
+      setSubTotal(discountAmount);
+      setCouponApplied(true);
+      setCouponButtonDisabled(true);
+    } else {
+      setCouponApplied(false);
+      console.error("Coupon has expired.");
+      toast.error("Coupon has expired.", {
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  } else {
+    setCouponApplied(false);
+    console.error("Invalid coupon code. Please try again.");
+    toast.error("Invalid coupon code. Please try again.", {
+      position: "top-center",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  }
+};
+
 
  
   
@@ -340,6 +417,35 @@ const initiatePayment = async () => {
       </div>
     ))}
   </div>
+</div>
+<div class="bg-gray-100 p-6 mt-2 rounded-lg shadow-lg">
+  <h1 class="text-2xl font-semibold mb-4">Apply Coupon Code</h1>
+  <span class="block text-gray-700 font-semibold mb-2">For Discount</span>
+  <div class="mb-4">
+    <input
+      type="text"
+      id="coupon"
+      name="coupon"
+      value={couponCode}
+      onChange={(e) => setCouponCode(e.target.value)}
+      class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 focus:border-blue-500"
+      placeholder="Enter your coupon code"
+    />
+  </div>
+  <div class="text-center">
+  <button
+          onClick={applyCoupon}
+          disabled={couponButtonDisabled} // Apply the disabled state to the button
+          class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-500 focus:border-blue-500"
+        >
+          Apply Coupon
+        </button>
+  </div>
+{couponApplied && discountPrice > 0 && (
+  <div class="mt-4 text-green-500">
+    Coupon code applied successfully! You saved Flat {discountPrice}%.
+  </div>
+)}
 </div>
 
             
