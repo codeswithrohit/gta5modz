@@ -6,29 +6,24 @@ import { toast,ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const RecentlyUpdated = ({ Productdata, addToCart, membertype, user }) => {
-  const recentlyProducts = Productdata.filter(product => product.category === "RECENTLY PRODUCTS");
   const [downloading, setDownloading] = useState(false);
   const [downloadCount, setDownloadCount] = useState(0);
   const [userDownloads, setUserDownloads] = useState(null);
 
   useEffect(() => {
+    // Fetch user's download data when the component mounts
     const fetchUserDownloads = async () => {
       if (user) {
         const userRef = firebase.firestore().collection("Users").doc(user);
         const doc = await userRef.get();
         if (doc.exists) {
           setUserDownloads(doc.data());
-        } else {
-          console.error("User document does not exist");
         }
-      } else {
-        console.error("User is null or undefined");
       }
     };
-  
+
     fetchUserDownloads();
   }, [user]);
-  
 
   useEffect(() => {
     // Update the download count in Firestore when downloadCount changes
@@ -83,12 +78,12 @@ const RecentlyUpdated = ({ Productdata, addToCart, membertype, user }) => {
   }, [userDownloads]);
 
   return (
-    <div className="font-[sans-serif] py-4">
+    <div className=" bg-white min-h-screen font-[sans-serif] py-4">
       <div className="p-4 mx-auto lg:max-w-6xl max-w-xl md:max-w-full">
-        <h2 className="text-xl font-extrabold text-gray-800 mb-12">Recently Uploaded</h2>
+        <h2 className="text-xl font-extrabold text-gray-800 mb-12">All Mods</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-6">
-          {recentlyProducts.map((Product) => (
+          {Productdata.map((Product) => (
             <div className="bg-gray-100 rounded-2xl p-6 cursor-pointer hover:-translate-y-2 transition-all relative" key={Product.id}>
               <div className="w-30 h-10 flex items-center justify-center rounded-full cursor-pointer absolute -top-2 right-1">
                 <span className="uppercase text-xs bg-green-50 p-0.5 border-green-500 border rounded text-green-700 font-medium select-none">

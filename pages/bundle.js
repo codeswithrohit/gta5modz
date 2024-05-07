@@ -9,7 +9,7 @@ const RecentlyUpdated = ({addToCart, membertype}) => {
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(() => {
       const db = firebase.firestore();
-      const ProductsRef = db.collection("Paidmod");
+      const ProductsRef = db.collection("Bundlemod");
 
       ProductsRef.get()
         .then((querySnapshot) => {
@@ -42,7 +42,7 @@ const RecentlyUpdated = ({addToCart, membertype}) => {
   return (
     <div class="font-[sans-serif] py-4 min-h-screen bg-white">
       <div class="p-4 mx-auto lg:max-w-6xl max-w-xl md:max-w-full">
-        <h2 class="text-xl font-extrabold text-gray-800 mb-12">Paid Mod</h2>
+        <h2 class="text-xl font-extrabold text-gray-800 mb-12">Bundle Mod</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-6">
           {Productdata.map((Product) => (
@@ -52,7 +52,7 @@ const RecentlyUpdated = ({addToCart, membertype}) => {
                   {Product.MemberType}
                 </span>
               </div> */}
-              <a href={`/Product-Details2?id=${Product.id}`} >
+              <a href={`/Product-Details3?id=${Product.id}`} >
               <div class="w-4/3 h-[120px] overflow-hidden mx-auto aspect-w-16 aspect-h-8">
                 <img src={Product.frontImage} alt={Product.name} class="h-full w-full rounded-xl object-contain" />
               </div>

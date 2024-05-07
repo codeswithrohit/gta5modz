@@ -15,13 +15,21 @@ const Subscription = ({user,userData}) => {
       price: 34.95,
       duration: "MONTH",
       features: [
-        "Get access to Diamond Mods - Weapon - Vehicle - Map/Prop Area. (Paid Mod not included)",
-        "Get an EXTRA 15% DISCOUNT when buying PAID MODS",
-        "12 Download per day. Totally 360 download per month.",
+        "Get access to SILVER Mods Area (Paid Mod not included).",
+        "Get an EXTRA 30% DISCOUNT when buying PAID MODS",
+        "Totally 50 download per month.",
+        "Mods update alternate days.",
+        "You can get 3 Mods in Paid Mods Area for Free each period (only for $3.99 single Mods)",
+        "Secure payment with RazorpayCustomize Mods size according to your needs (1 resize requests per membership period)",
+        "Customize Mods colours according to your needs (1 colours change requests per membership period )",
+        "Priority for receiving Mod requests",
+        "Requests are made within 3 days (estimated time)",
         "Your support help us keep the website up and running",
+        "Get immediate support 24/7",
         "Live Chat support 24/7",
         "All Mods won't be released anywhere else ever",
-        "Secure payment with Razorpay"
+        "Secure payment with PayPal",
+        "Cancel at anytime",
       ]
     },
     {
@@ -31,28 +39,46 @@ const Subscription = ({user,userData}) => {
       price: 699,
       duration: "ONE TIME PAYMENT",
       features: [
-        "Download Everything on Website for FREE!",
-        "Download All Diamond Mods Area unlimited times for life for FREE",
-        "Download All Paid Mods Area unlimited times for life for FREE",
-        "Download All Bundle Area unlimited times for life for FREE",
-        "You are the Co-owner member of our TEAM !",
-        "Secure payment with Razorpay"
+        "Get access to GOLD Mods Area (Paid Mod not included).",
+        "Get an EXTRA 30% DISCOUNT when buying PAID MODS",
+        "Totally 100 download per month.",
+        "Mods update alternate days.",
+        "You can get 5 Mods in Paid Mods Area for Free each period (only for $3.99 single Mods",
+        "Customize Mods size according to your needs (3 resize requests per membership period)",
+        "Customize Mods colours according to your needs (3 colours change requests per membership period )",
+        "Priority for receiving Mod requests",
+        "Requests are made within 3 days (estimated time)",
+        "Your support help us keep the website up and running",
+        "Get immediate support 24/7",
+        "Live Chat support 24/7",
+        "All Mods won't be released anywhere else ever",
+        "Secure payment with PayPal",
+        "Cancel at anytime",
       ]
     },
     {
       id: 3,
-      name: "LIFETIME DIAMOND",
+      name: "DIAMOND MEMBER",
       img:"https://gta5modaz.com/wp-content/uploads/2021/08/gold140.png",
       price: 299,
       duration: "ONE TIME PAYMENT",
       features: [
-        "Get access to Diamond Mods - Weapon - Vehicle - Map/Prop Area. (Paid Mod not included)",
-        "Get an EXTRA 20% DISCOUNT when buying PAID MODS",
-        "Unlimited download",
-        "You support our TEAM alot !",
-        "Can ask for Technical support",
+        "Download All Diamond Mods Area unlimited times for life for FREE",
+        "Download All Paid Mods Area unlimited times for life for FREE",
+        "Download All Bundle Area unlimited times for life for FREE",
+        "Download EVERYTHING ON WEBSITE FOR FREE !",
+        "Mods update alternate days.",
+        "Customize Mods size according to your needs (10 resize requests per membership period)",
+        "Customize Mods colours according to your needs (10 colours change requests per membership period )",
+        "Priority for receiving Mod requests",
+        "Requests are made within 3 days (estimated time)",
+        "Your support help us keep the website up and running",
+        "Get immediate support 24/7",
+        "Live Chat support 24/7",
         "All Mods won't be released anywhere else ever",
-        "Secure payment with Razorpay"
+        "Secure payment with PayPal",
+        "Cancel at anytime",
+
       ]
     }
   ];
@@ -63,9 +89,16 @@ const Subscription = ({user,userData}) => {
   const [isLoading, setIsLoading] = useState(false);
 
   const openPopup = (plan) => {
+    // Check if userData is available
+    if (!userData) {
+      // Redirect to login page
+      router.push('/login');
+      return;
+    }
     setSelectedPlan(plan);
     setShowPopup(true);
   };
+  
 
   const closePopup = () => {
     setShowPopup(false);
@@ -89,6 +122,7 @@ const Subscription = ({user,userData}) => {
 };
 
   const initiatePayment = async () => {
+    
     try {
       setIsLoading(true);
       const userDataToSubmit = {

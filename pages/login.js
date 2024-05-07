@@ -40,9 +40,7 @@ const Login = () => {
       setLoading(false); // Set loading to false after successful login
     } catch (error) {
       // Show error toast notification
-      toast.error('Email and Password are incorrect ', {
-        position: toast.POSITION.TOP_RIGHT,
-      });
+      toast.error('Email and Password are incorrect ');
       setLoading(false); // Set loading to false after encountering an error
     }
   };

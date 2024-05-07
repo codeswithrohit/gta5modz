@@ -8,16 +8,16 @@ import Recentlyupdated from '@/components/Recentlyupdated'
 import Testimonial from '@/components/Testimonial'
 import React from 'react'
 
-const Index = ({Productdata,addToCart,membertype}) => {
+const Index = ({Productdata,addToCart,membertype,user}) => {
  
   return (
     <div className='bg-white' >
       <HomeCarousel/>
       {/* <Indexfirest/>
       <IndexTwo/> */}
-      <Recentlyupdated Productdata={Productdata} addToCart={addToCart} membertype={membertype} />
+      <Recentlyupdated Productdata={Productdata} addToCart={addToCart} membertype={membertype} user={user} />
       <Testimonial/>
-      <Gameproduct Productdata={Productdata} addToCart={addToCart} membertype={membertype}  />
+      <Gameproduct Productdata={Productdata} addToCart={addToCart} membertype={membertype} user={user}  />
     </div>
   )
 }

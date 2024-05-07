@@ -8,7 +8,7 @@ import "react-toastify/dist/ReactToastify.css";
 import AdminNavbar from "@/components/AdminNavbar";
 import { FiTrash2, FiEdit, FiStar } from "react-icons/fi"
 const db = firebase.firestore();
-const Paidmod = () => {
+const Bundlemod = () => {
   const router = useRouter(); 
 
   const [isAdmin, setIsAdmin] = useState(false);
@@ -90,7 +90,7 @@ const Paidmod = () => {
       }
 
       const dataToUpload = { ...formData, frontImage: frontImageUrl, zipfile: zipfileurl };
-      await db.collection("Paidmod").add(dataToUpload);
+      await db.collection("Bundlemod").add(dataToUpload);
       toast.success("Data uploaded successfully!");
       router.reload();
     } catch (error) {
@@ -109,7 +109,7 @@ console.log("editproduct",editedProduct)
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged(() => {
       const db = firebase.firestore();
-      const ProductsRef = db.collection("Paidmod");
+      const ProductsRef = db.collection("Bundlemod");
 
       ProductsRef.get()
         .then((querySnapshot) => {
@@ -217,7 +217,7 @@ console.log("editproduct",editedProduct)
     try {
       if (editedProduct) {
         const db = firebase.firestore();
-        const ProductRef = db.collection("Paidmod").doc(editedProduct.id);
+        const ProductRef = db.collection("Bundlemod").doc(editedProduct.id);
         await ProductRef.update({
           name: editedProduct.name,
           price: editedProduct.price,
@@ -256,7 +256,7 @@ console.log("editproduct",editedProduct)
   const handleDelete = async (id) => {
     try {
       const db = firebase.firestore();
-      await db.collection("Paidmod").doc(id).delete();
+      await db.collection("Bundlemod").doc(id).delete();
       const updatedData = Productdata.filter((item) => item.id !== id);
       setProductData(updatedData);
       toast.success("Deletion successful!", {
@@ -280,7 +280,7 @@ console.log("editproduct",editedProduct)
 // Function to handle showing reviews for a specific Product item
 const handleShowReviews = async (selectedItemId) => {
   try {
-    const ProductRef = db.collection("Paidmod").doc(selectedItemId);
+    const ProductRef = db.collection("Bundlemod").doc(selectedItemId);
     const ProductDoc = await ProductRef.get();
 
     if (ProductDoc.exists) {
@@ -316,7 +316,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
       throw new Error("No selected Product found");
     }
 
-    const ProductRef = db.collection("Paidmod").doc(selectedEditedId);
+    const ProductRef = db.collection("Bundlemod").doc(selectedEditedId);
     const ProductDoc = await ProductRef.get();
 
     if (!ProductDoc.exists) {
@@ -369,7 +369,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
     <div className="m-auto min-h-screen bg-white dark:bg-gray-900">
       <AdminNavbar/>
       <section className="bg-white lg:ml-64  dark:bg-gray-900">
-      <h1 className="text-xl text-red-600 text-center font-bold" >Paid Mod Product</h1>
+      <h1 className="text-xl text-red-600 text-center font-bold" >Bundle Mod Product</h1>
         <div className="container px-6 py-10 mx-auto">
           {showAllInputFormats ? (
             <div>
@@ -894,4 +894,4 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
   );
 };
 
-export default Paidmod;
+export default Bundlemod;

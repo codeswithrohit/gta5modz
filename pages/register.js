@@ -83,7 +83,7 @@ const Signup = () => {
   
       // Show success toast notification
       toast.success('Your account has been created.');
-  
+      router.push('/')
       // Clear the form data
       setFormData({
         username: '',

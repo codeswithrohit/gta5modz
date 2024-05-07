@@ -39,7 +39,7 @@ export default ({user,userData, addToCart, cart, removeFromCart, clearCart, subT
     const submenuNav = [
         { title: "Membership", Icon: FaChartBar,path: "/subscription" },
         { title: "Home", Icon: FaHome,path: "/" },
-        { title: "All Mods", Icon: FaCube,path: "/allmods"  },
+        { title: "All Mods", Icon: FaCube,path: "/allmod"  },
         { title: "Bundle", Icon: FaTags,path: "/bundle"  },
         { title: "Paid Mod", Icon: FaMoneyBillAlt,path: "/paidmod"  },
         { title: "Miscellaneous", Icon: FaEllipsisH,path: "/miscellaneous"  },
@@ -83,20 +83,19 @@ export default ({user,userData, addToCart, cart, removeFromCart, clearCart, subT
   //  [user] };
   
     // console.log("nav User",user,userData)
+    const [loggingOut, setLoggingOut] = useState(false);
+
   const handleLogout = async () => {
     try {
-      const auth = getAuth();
-      toast.success('You have successfully logged out!', {
-        position: 'top-center',
-        autoClose: 3000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      setLoggingOut(true); // Set state to indicate logout is in progress
+      await firebase.auth().signOut(); // Perform the logout action using Firebase Auth
+      // Additional cleanup or state resetting if needed after logout
+
+      setLoggingOut(false); // Reset state after successful logout
+      window.location.reload();
     } catch (error) {
-      setIsLoading(false); // End the loading state in case of error
-      console.error('Error logging out:', error);
+      console.error("Error during logout:", error);
+      setLoggingOut(false); // Reset state in case of an error during logout
     }
   };
 
@@ -210,7 +209,7 @@ const handleCheckout = () => {
                             Credits are renewed every day at 8:00 (UTC)</p>
                     </div>
                     <div>
-                        <button className="px-1 py-1 text-xs ml-4 font-bold bg-gray-800 text-white rounded uppercase hover:bg-gray-500">Unlock Gold Member Access!</button>
+                        <button className="px-1 py-1 text-xs ml-4 font-bold bg-gray-800 text-white rounded uppercase hover:bg-gray-500">Unlock DIAMOND MEMBER Free Access!</button>
                     </div>
                 </section>
             </div>

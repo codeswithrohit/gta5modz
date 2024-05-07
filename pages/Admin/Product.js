@@ -451,7 +451,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
     <option value="">Select Member Type Products</option>
     <option value="SILVER MEMBER">SILVER MEMBER</option>
     <option value="GOLD MEMBER">GOLD MEMBER</option>
-    <option value="LIFETIME DIAMOND">LIFETIME DIAMOND</option>
+    <option value="DIAMOND MEMBER">DIAMOND MEMBER</option>
   </select>
 </div>
                 <div>
@@ -819,7 +819,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
     <option value="">Select MemberType Products</option>
     <option value="SILVER MEMBER">SILVER MEMBER</option>
     <option value="GOLD MEMBER">GOLD MEMBER</option>
-    <option value="LIFETIME DIAMOND">LIFETIME DIAMOND</option>
+    <option value="DIAMOND MEMBER">DIAMOND MEMBER</option>
   </select>
 </div>
                 <div>

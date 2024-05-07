@@ -104,6 +104,18 @@ function SideNavbar() {
        Game Paid Mod
       </h3>
     </Link>
+              <Link href='/Admin/Bundle' className={`flex  mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer m-auto ${
+      router.pathname === '/Admin/Bundle' ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-gray-900'
+    }`}>
+      <IoIosAddCircle className={`text-2xl ${
+        router.pathname === '/Admin/Bundle' ? 'text-white' : 'text-gray-600 group-hover:text-white'
+      }`} />
+      <h3 className={`text-base ${
+        router.pathname === '/Admin/Bundle' ? 'text-white' : 'text-gray-800 group-hover:text-white'
+      } font-semibold`}>
+       Game Bundle Mod
+      </h3>
+    </Link>
              
 
 
