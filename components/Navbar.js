@@ -27,9 +27,23 @@ const SubmenuNavItem = ({ title, Icon, path }) => {
 };
 
 
-export default ({user,userData, addToCart, cart, removeFromCart, clearCart, subTotal,cartLength}) => {
+export default ({user,userData, addToCart, cart, removeFromCart, clearCart, subTotal,cartLength,Productdata}) => {
   const router = useRouter();
-  console.log("cartdetail",cart,cartLength)
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
+  const handleSearch = (e) => {
+    const query = e.target.value.toLowerCase();
+    setSearchQuery(query);
+    if (query.length > 0) {
+      const filtered = Productdata.filter((product) =>
+        product.name.toLowerCase().includes(query)
+      );
+      setFilteredProducts(filtered);
+    } else {
+      setFilteredProducts([]);
+    }
+  };
     const [state, setState] = useState(false);
     const navigation = [
         { title: "3344 mods", path: "javascript:void(0)" },
@@ -196,9 +210,9 @@ const handleCheckout = () => {
             <div className="hidden bg-gray-500 lg:block px relative z-40 px-4 ">
                 <section className="py-1 bg-gray-500 px-10 flex justify-between">
                     <div className="flex flex-row">
-                        <a href="#"><FaFacebookF className="mx-2 text-white" /></a>
+                        <a target="_blank" href="https://www.facebook.com/share/S8TGBaFZUurREHme/?mibextid=qi2Omg"><FaFacebookF className="mx-2 text-white" /></a>
                         <a href="#"><FaTwitter className="mx-2 text-white" /></a>
-                        <a href="#"><FaInstagram className="mx-2 text-white" /></a>
+                        <a target="_blank" href="https://www.instagram.com/gta_mods_creater?utm_source=qr&igsh=MnRreHF1cXM3dHp4"><FaInstagram className="mx-2 text-white" /></a>
                         <a href="#"><FaEnvelope className="mx-2 text-white" /></a>
                         <a href="#"><FaPinterest className="mx-2 text-white" /></a>
                         <a href="#"><FaLinkedinIn className="mx-2 text-white" /></a>
@@ -368,18 +382,42 @@ const handleCheckout = () => {
                     </div>
                     <div className={`nav-menu flex-1 pb-28 mt-8 overflow-y-auto max-h-screen lg:block lg:overflow-visible lg:pb-0 lg:mt-0 ${state ? "" : "hidden"}`}>
                         <ul className="items-center space-y-6 lg:flex lg:space-x-6 lg:space-y-0">
-                            <form onSubmit={(e) => e.preventDefault()} className='flex-1 items-center justify-start pb-4 lg:flex lg:pb-0'>
-                                <div className="flex w-96 items-center gap-1 px-2 border rounded-lg">
-                                    <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                    </svg>
-                                    <input
-                                        type="text"
-                                        placeholder="Enter name of mod you want here"
-                                        className="w-full px-2 py-2 text-gray-500 bg-transparent rounded-md outline-none"
-                                    />
-                                </div>
-                            </form>
+                        <form onSubmit={(e) => e.preventDefault()} className='flex-1 items-center justify-center pb-4 lg:flex lg:pb-0'>
+    <div className="flex flex-col w-96 items-center gap-1 px-2 border rounded-lg">
+        {/* <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg> */}
+        <input
+            type="text"
+            placeholder="Enter name of mod you want here"
+            className="w-full px-2 py-2 text-gray-500 bg-transparent rounded-md outline-none"
+            onChange={handleSearch}
+        />
+        <div className="items-center justify-center" >
+          {
+            filteredProducts.length > 0 && (
+                <div className="absolute top-20 p-4  bg-slate-800 text-white w-96 rounded-xl  -translate-x-1/2 flex flex-col gap-2">
+                    {
+                       filteredProducts.map(s => (
+                        <a className="cursor-pointer" href={`/Product-Details?id=${s.id}`}>
+                            {s.name}
+                            </a>
+                        ))
+                    }
+                </div>
+            )
+        }
+        </div>
+
+    </div>
+   
+</form>
+
+
+<div>
+   
+</div>
+
                             {navigation.map((item, idx) => (
                                 <li key={idx}>
                                     <a href={item.path} className="block text-black hover:text-black py-2 px-4 rounded-md bg-gray-200 hover:bg-gray-800 hover:text-white">

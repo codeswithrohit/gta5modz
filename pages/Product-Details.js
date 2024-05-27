@@ -296,9 +296,18 @@ const ProductDetails = ({ bookNow, addToCart,cart }) => {
           <div class="flex flex-wrap items-start gap-4">
             <div>
               <h2 class="text-2xl font-extrabold text-gray-800">{productdata.name}</h2>
-              <p class="text-sm text-gray-400 mt-2">{productdata.MemberType} Membership</p>
+              <div className=" flex flex-row gap-1">
+              {productdata.MemberType.map((member) => (
+                <div
+                  key={member.value}
+                  className="w-30 h-10 flex flex-row items-center justify-center rounded-full cursor-pointer"
+                >
+                  
+                  <p class="text-sm text-gray-800 mt-2"> {member.label} |</p>
+                </div>
+              ))}
             </div>
-          
+          </div>
           </div>
           <hr class="my-8" />
           <div class="flex flex-wrap gap-4 items-start">

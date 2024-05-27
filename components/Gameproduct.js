@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import { RiDownload2Line } from 'react-icons/ri';
 import { firebase } from "../Firebase/config";
 import "firebase/firestore";
-import { toast,ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Gameproduct = ({ Productdata, addToCart, membertype, user }) => {
-  console.log("recently product",  Productdata);
+  console.log("recently product", Productdata);
   const hotProducts = Productdata.filter(product => product.category === "HOT MODS");
   const bestProducts = Productdata.filter(product => product.category === "BEST SELLING MODS");
   const topProducts = Productdata.filter(product => product.category === "TOP RATED MODS");
@@ -74,230 +74,94 @@ const Gameproduct = ({ Productdata, addToCart, membertype, user }) => {
       console.log("Download count:", downloadCount);
     }
   };
-  
 
   useEffect(() => {
     // Log user's download data when fetched
     console.log("User downloads:", userDownloads);
   }, [userDownloads]);
+
+  const renderProducts = (products, category) => (
+    <div className="mt-10 flex flex-col gap-6 lg:mt-2">
+      <div className="mx-auto max-w-md text-center">
+        <h2 className="font-serif text-sm font-bold sm:text-lg uppercase">{category}</h2>
+        <div className="border-b-4 border-black w-16 mx-auto mt-2"></div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+        {products.slice(0, 2).map((Product) => (
+          <div key={Product.id} className="bg-gray-100 rounded-2xl p-6 cursor-pointer hover:-translate-y-2 transition-all relative">
+            <div className="absolute top-0 left-2 flex flex-row gap-1">
+              {Product.MemberType.map((member) => (
+                <div
+                  key={member.value}
+                  className="w-30 h-10 flex flex-row items-center justify-center rounded-full cursor-pointer"
+                >
+                  <span className="uppercase text-[7px] font-bold bg-green-50 p-0.5 border-green-500 border rounded text-red-600 font-medium select-none">
+                    {member.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <div className="w-4/3 h-[120px] overflow-hidden mx-auto aspect-w-16 mt-2 aspect-h-8">
+              <img src={Product.frontImage} alt={Product.name} className="h-full w-full rounded-xl object-contain" />
+            </div>
+            <div className="text-center mt-4">
+              <h3 className="text-sm font-extrabold text-gray-800">{Product.name}</h3>
+              <h4 className="text-xl text-gray-800 font-bold mt-4">${Product.price}</h4>
+              {Product.MemberType.some(member => member.label === membertype) || membertype === 'DIAMOND MEMBER' ? (
+                <button
+                  type="button"
+                  onClick={() => handleDownload(Product.zipfile)}
+                  className="w-full flex items-center justify-center gap-3 mt-6 px-4 py-1.5 bg-transparent hover:bg-gray-200 text-base text-[#333] border-2 font-semibold border-[#333] rounded-xl"
+                  disabled={downloading}
+                >
+                  {downloading ? "Downloading..." : (
+                    <>
+                      <RiDownload2Line size={20} />
+                      Download
+                    </>
+                  )}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() =>
+                    addToCart(
+                      Product.id,
+                      1,
+                      Product.price,
+                      Product.name,
+                      Product.frontImage
+                    )
+                  }
+                  className="w-full flex items-center justify-center gap-3 mt-6 px-4 py-1.5 bg-transparent hover:bg-gray-200 text-base text-[#333] border-2 font-semibold border-[#333] rounded-xl"
+                >
+                  Add to cart
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="text-center mt-4">
+        <a href={`/${category.replace(/\s+/g, '-').toLowerCase()}`} className="text-blue-500 hover:underline">View All</a>
+      </div>
+    </div>
+  );
+
   return (
     <div>
-        <section class="bg-white py-12 text-gray-700 sm:py-8 lg:py-10">
-  <div class="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
-    
-
-    <div class="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-3 lg:mt-2">
-      
-      
-    <div class="mt-10 flex flex-col gap-6 lg:mt-2">
-      
-    <div class="mx-auto max-w-md text-center">
-      <h2 class="font-serif text-sm font-bold sm:text-lg uppercase">Hot mods</h2>
-      <div class="border-b-4 border-black w-16 mx-auto mt-2"></div>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {hotProducts.map((Product) => (
-            <div class="bg-gray-100 rounded-2xl p-6 cursor-pointer hover:-translate-y-2 transition-all relative">
-              <div class="w-30 h-10 flex items-center justify-center rounded-full cursor-pointer absolute -top-2 right-1">
-                <span className="uppercase text-xs bg-green-50 p-0.5 border-green-500 border rounded text-green-700 font-medium select-none">
-                  {Product.MemberType}
-                </span>
-              </div>
-              <div class="w-4/3 h-[120px] overflow-hidden mx-auto aspect-w-16 aspect-h-8">
-                <img src={Product.frontImage} alt={Product.name} class="h-full w-full rounded-xl object-contain" />
-              </div>
-              <div class="text-center mt-4">
-                <h3 class="text-sm font-extrabold text-gray-800">{Product.name}</h3>
-                <h4 class="text-xl text-gray-800 font-bold mt-4">${Product.price}</h4>
-               {Product.MemberType === membertype || membertype === 'DIAMOND MEMBER' ? (
-                  <button
-                  type="button"
-                  onClick={() => handleDownload(Product.zipfile)}
-                  className="w-full flex items-center justify-center gap-3 mt-6 px-4 py-1.5 bg-transparent hover:bg-gray-200 text-base text-[#333] border-2 font-semibold border-[#333] rounded-xl"
-                  disabled={downloading} // Disable button while downloading
-                >
-                  {downloading ? "Downloading..." : (
-                    <>
-                      <RiDownload2Line size={20} /> {/* Using the download icon component */}
-                      Download
-                    </>
-                  )}
-                </button>
-                ) : (
-                  <button
-                  type="button"
-                  onClick={() =>
-                    addToCart(
-                      Product.id, // Pass productdata.id as itemCode
-                      1,
-                      Product.price,
-                      Product.name,
-                      Product.frontImage
-                    )
-                  }
-                  class="w-full flex items-center justify-center gap-3 mt-6 px-4 py-1.5 bg-transparent hover:bg-gray-200 text-base text-[#333] border-2 font-semibold border-[#333] rounded-xl"
-                >
-                  Add to cart
-                </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      
-      
-    </div>
-
-
-    <div class="mt-10 flex flex-col gap-6 lg:mt-2">
-    <div class="mx-auto max-w-md text-center">
-      <h2 class="font-serif text-sm font-bold sm:text-lg uppercase">Best selling mods</h2>
-      <div class="border-b-4 border-black w-16 mx-auto mt-2"></div>
-    </div>
-      
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {bestProducts.map((Product) => (
-            <div class="bg-gray-100 rounded-2xl p-6 cursor-pointer hover:-translate-y-2 transition-all relative">
-              <div class="w-30 h-10 flex items-center justify-center rounded-full cursor-pointer absolute -top-2 right-1">
-                <span className="uppercase text-xs bg-green-50 p-0.5 border-green-500 border rounded text-green-700 font-medium select-none">
-                  {Product.MemberType}
-                </span>
-              </div>
-              <div class="w-4/3 h-[120px] overflow-hidden mx-auto aspect-w-16 aspect-h-8">
-                <img src={Product.frontImage} alt={Product.name} class="h-full w-full rounded-xl object-contain" />
-              </div>
-              <div class="text-center mt-4">
-                <h3 class="text-sm font-extrabold text-gray-800">{Product.name}</h3>
-                <h4 class="text-xl text-gray-800 font-bold mt-4">${Product.price}</h4>
-               {Product.MemberType === membertype || membertype === 'DIAMOND MEMBER' ? (
-                  <button
-                  type="button"
-                  onClick={() => handleDownload(Product.zipfile)}
-                  className="w-full flex items-center justify-center gap-3 mt-6 px-4 py-1.5 bg-transparent hover:bg-gray-200 text-base text-[#333] border-2 font-semibold border-[#333] rounded-xl"
-                  disabled={downloading} // Disable button while downloading
-                >
-                  {downloading ? "Downloading..." : (
-                    <>
-                      <RiDownload2Line size={20} /> {/* Using the download icon component */}
-                      Download
-                    </>
-                  )}
-                </button>
-                ) : (
-                  <button
-                  type="button"
-                  onClick={() =>
-                    addToCart(
-                      Product.id, // Pass productdata.id as itemCode
-                      1,
-                      Product.price,
-                      Product.name,
-                      Product.frontImage
-                    )
-                  }
-                  class="w-full flex items-center justify-center gap-3 mt-6 px-4 py-1.5 bg-transparent hover:bg-gray-200 text-base text-[#333] border-2 font-semibold border-[#333] rounded-xl"
-                >
-                  Add to cart
-                </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      
-      
-    </div>
-    
-    {/* <div class="mt-10 flex flex-col gap-6 lg:mt-2">
-      
-    <div class="mx-auto max-w-md text-center">
-      <h2 class="font-serif text-sm font-bold sm:text-lg uppercase">Bundles</h2>
-      <div class="border-b-4 border-black w-16 mx-auto mt-2"></div>
-    </div>
-    <article class="relative h-72 w-48 flex flex-col overflow-hidden rounded-lg border">
-        <div class=" overflow-hidden">
-          <img class="h-72 w-48 object-cover transition-all duration-300 group-hover:scale-125" src="a3.png" alt="" />
-        </div>
-
-        <div class="my-4 mx-auto flex w-10/12 flex-col items-start justify-between">
-          <div class="mb-2 flex">
-            <p class="mr-3 text-sm font-semibold">$99.00</p>
-            <del class="text-xs text-gray-400"> $79.00 </del>
+      <section className="bg-white py-12 text-gray-700 sm:py-8 lg:py-10">
+        <div className="mx-auto max-w-screen-xl px-4 sm:px-6 lg:px-8">
+          <div className="mt-10 grid grid-cols-2 gap-6 sm:grid-cols-3 sm:gap-3 lg:mt-2">
+            {renderProducts(hotProducts, "Hot mods")}
+            {renderProducts(bestProducts, "Best selling mods")}
+            {renderProducts(topProducts, "Top rated mods")}
           </div>
-          <h3 class="mb-2 text-sm text-gray-400">thumbweb</h3>
         </div>
-        <button class="group mx-auto mb-2 flex h-10 w-10/12 items-stretch overflow-hidden rounded-md text-gray-600">
-          <div class="flex w-full items-center justify-center bg-gray-100 text-xs uppercase transition group-hover:bg-emerald-600 group-hover:text-white">Add</div>
-          <div class="flex items-center justify-center bg-gray-200 px-5 transition group-hover:bg-emerald-500 group-hover:text-white">+</div>
-        </button>
-      </article>
-      
-      
-    </div> */}
-    <div class="mt-10 flex flex-col gap-6 lg:mt-2">
-    <div class="mx-auto max-w-md text-center">
-      <h2 class="font-serif text-sm font-bold sm:text-lg uppercase">top rated mods</h2>
-      <div class="border-b-4 border-black w-16 mx-auto mt-2"></div>
+      </section>
+      <ToastContainer />
     </div>
-      
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
-          {topProducts.map((Product) => (
-            <div class="bg-gray-100 rounded-2xl p-6 cursor-pointer hover:-translate-y-2 transition-all relative">
-              <div class="w-30 h-10 flex items-center justify-center rounded-full cursor-pointer absolute -top-2 right-1">
-                <span className="uppercase text-xs bg-green-50 p-0.5 border-green-500 border rounded text-green-700 font-medium select-none">
-                  {Product.MemberType}
-                </span>
-              </div>
-              <div class="w-4/3 h-[120px] overflow-hidden mx-auto aspect-w-16 aspect-h-8">
-                <img src={Product.frontImage} alt={Product.name} class="h-full w-full rounded-xl object-contain" />
-              </div>
-              <div class="text-center mt-4">
-                <h3 class="text-sm font-extrabold text-gray-800">{Product.name}</h3>
-                <h4 class="text-xl text-gray-800 font-bold mt-4">${Product.price}</h4>
-               {Product.MemberType === membertype || membertype === 'DIAMOND MEMBER' ? (
-                  <button
-                  type="button"
-                  onClick={() => handleDownload(Product.zipfile)}
-                  className="w-full flex items-center justify-center gap-3 mt-6 px-4 py-1.5 bg-transparent hover:bg-gray-200 text-base text-[#333] border-2 font-semibold border-[#333] rounded-xl"
-                  disabled={downloading} // Disable button while downloading
-                >
-                  {downloading ? "Downloading..." : (
-                    <>
-                      <RiDownload2Line size={20} /> {/* Using the download icon component */}
-                      Download
-                    </>
-                  )}
-                </button>
-                ) : (
-                  <button
-                  type="button"
-                  onClick={() =>
-                    addToCart(
-                      Product.id, // Pass productdata.id as itemCode
-                      1,
-                      Product.price,
-                      Product.name,
-                      Product.frontImage
-                    )
-                  }
-                  class="w-full flex items-center justify-center gap-3 mt-6 px-4 py-1.5 bg-transparent hover:bg-gray-200 text-base text-[#333] border-2 font-semibold border-[#333] rounded-xl"
-                >
-                  Add to cart
-                </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      
-      
-    </div>
-    </div>
-  </div>
-</section>
-
-    </div>
-  )
+  );
 }
 
-export default Gameproduct
+export default Gameproduct;

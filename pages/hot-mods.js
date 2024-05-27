@@ -2,24 +2,37 @@ import React, { useState, useEffect } from "react";
 import { RiDownload2Line } from 'react-icons/ri';
 import { firebase } from "../Firebase/config";
 import "firebase/firestore";
-import { toast,ToastContainer } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const RecentlyUpdated = ({ Productdata, addToCart, membertype, user }) => {
-  const Products = Productdata.filter(product => product.varient === "Normal");
+const HOTMODS = ({ Productdata, addToCart, membertype, user }) => {
+  const recentlyProducts = Productdata.filter(product => product.category === "HOT MODS");
+
+  // Log recently updated products with MemberType details
+  console.log(recentlyProducts.map(product => ({
+    ...product,
+    MemberType: product.MemberType.map(member => ({
+      label: member.label,
+      value: member.value
+    }))
+  })));
+
   const [downloading, setDownloading] = useState(false);
   const [downloadCount, setDownloadCount] = useState(0);
   const [userDownloads, setUserDownloads] = useState(null);
 
   useEffect(() => {
-    // Fetch user's download data when the component mounts
     const fetchUserDownloads = async () => {
       if (user) {
         const userRef = firebase.firestore().collection("Users").doc(user);
         const doc = await userRef.get();
         if (doc.exists) {
           setUserDownloads(doc.data());
+        } else {
+          console.error("User document does not exist");
         }
+      } else {
+        console.error("User is null or undefined");
       }
     };
 
@@ -71,7 +84,6 @@ const RecentlyUpdated = ({ Productdata, addToCart, membertype, user }) => {
       console.log("Download count:", downloadCount);
     }
   };
-  
 
   useEffect(() => {
     // Log user's download data when fetched
@@ -79,14 +91,14 @@ const RecentlyUpdated = ({ Productdata, addToCart, membertype, user }) => {
   }, [userDownloads]);
 
   return (
-    <div className=" bg-white min-h-screen font-[sans-serif] py-4">
+    <div className="font-[sans-serif] bg-white py-4">
       <div className="p-4 mx-auto lg:max-w-6xl max-w-xl md:max-w-full">
-        <h2 className="text-xl font-extrabold text-gray-800 mb-12">All Mods</h2>
+        <h2 className="text-xl font-extrabold text-gray-800 mb-12">Hot Mods</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-6">
-          {Products.map((Product) => (
+          {recentlyProducts.map((Product) => (
             <div className="bg-gray-100 rounded-2xl p-6 cursor-pointer hover:-translate-y-2 transition-all relative" key={Product.id}>
-             <div className="absolute top-0 left-2 flex flex-row gap-1">
+              <div className="absolute top-0 left-2 flex flex-row gap-1">
                 {Product.MemberType.map((member) => (
                   <div
                     key={member.value}
@@ -99,7 +111,7 @@ const RecentlyUpdated = ({ Productdata, addToCart, membertype, user }) => {
                 ))}
               </div>
               <a href={`/Product-Details?id=${Product.id}`} >
-                <div className="w-4/3 h-[120px] overflow-hidden mt-2 mx-auto aspect-w-16 aspect-h-8">
+                <div className="w-4/3 h-[120px] mt-2 overflow-hidden mx-auto aspect-w-16 aspect-h-8">
                   <img src={Product.frontImage} alt={Product.name} className="h-full w-full rounded-xl object-contain" />
                 </div>
               </a>
@@ -142,9 +154,9 @@ const RecentlyUpdated = ({ Productdata, addToCart, membertype, user }) => {
           ))}
         </div>
       </div>
-      <ToastContainer/>
+      <ToastContainer />
     </div>
   );
 };
 
-export default RecentlyUpdated;
+export default HOTMODS;

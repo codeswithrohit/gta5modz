@@ -7,6 +7,14 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AdminNavbar from "@/components/AdminNavbar";
 import { FiTrash2, FiEdit, FiStar } from "react-icons/fi"
+import Select from "react-select";
+
+const Members = [
+  { value: 1, label: "SILVER MEMBER" },
+  { value: 2, label: "GOLD MEMBER" },
+  { value: 3, label: "DIAMOND MEMBER" },
+];
+
 const db = firebase.firestore();
 const Product = () => {
   const router = useRouter(); 
@@ -31,8 +39,9 @@ const Product = () => {
     name: "",
     price: "",
     category: "",
+    varient: "",
     description: "",
-    MemberType: "",
+    MemberType: [],
     frontImage: "",
     zipfile: "",
   });
@@ -50,6 +59,7 @@ const Product = () => {
   const handleInputChanges = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    
   };
 
   const handleFileChange = (e) => {
@@ -66,6 +76,16 @@ const Product = () => {
       setFormData({ ...formData, [name]: files[0] });
     }
   };
+  const handleSelectChange = (selectedOptions) => {
+    setFormData({ ...formData, MemberType: selectedOptions });
+  };
+
+  
+ 
+
+  const [selectedOptions, setSelectedOptions] = useState(null);
+
+ 
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -146,7 +166,9 @@ console.log("editproduct",editedProduct)
       [name]: value,
     }));
   };
-
+  const handleEditSelectChange = (selectedOptions) => {
+    setEditedProduct({ ...editedProduct, MemberType: selectedOptions });
+  };
   const handleDeleteImage = async () => {
     try {
       const storage = firebase.storage();
@@ -223,6 +245,7 @@ console.log("editproduct",editedProduct)
         await ProductRef.update({
           name: editedProduct.name,
           price: editedProduct.price,
+          varient: editedProduct.varient,
           category: editedProduct.category,
           description: editedProduct.description,
           frontImage: editedProduct.frontImage,
@@ -263,14 +286,10 @@ console.log("editproduct",editedProduct)
       await db.collection("Product").doc(id).delete();
       const updatedData = Productdata.filter((item) => item.id !== id);
       setProductData(updatedData);
-      toast.success("Deletion successful!", {
-        position: toast.POSITION.TOP_CENTER,
-      });
+      toast.success("Deletion successful!");
     } catch (error) {
       console.error("Error deleting document: ", error);
-      toast.error("Deletion failed. Please try again.", {
-        position: toast.POSITION.TOP_CENTER,
-      });
+      toast.error("Deletion failed. Please try again.");
     }
   };
 
@@ -442,18 +461,27 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
                
                 <div>
   <select
-    name="MemberType"
-    value={formData.MemberType}
+    name="varient"
+    value={formData.varient}
     onChange={handleInputChanges}
     required
     className="appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
   >
-    <option value="">Select Member Type Products</option>
-    <option value="SILVER MEMBER">SILVER MEMBER</option>
-    <option value="GOLD MEMBER">GOLD MEMBER</option>
-    <option value="DIAMOND MEMBER">DIAMOND MEMBER</option>
+    <option value="">Select Varient</option>
+    <option value="Normal">Normal</option>
+    <option value="Paidmod">Paidmod</option>
+    <option value="Bundle">Bundle</option>
   </select>
 </div>
+<div className="px-2">
+                    <Select
+                      name="MemberType"
+                      value={formData.MemberType}
+                      onChange={handleSelectChange}
+                      options={Members}
+                      isMulti
+                    />
+                  </div>
                 <div>
   <select
     name="category"
@@ -463,6 +491,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
     className="appearance-none border rounded w-full py-2 px-3 text-black leading-tight focus:outline-none focus:shadow-outline"
   >
     <option value="">Select Category</option>
+    <option value="NONE">NONE</option>
     <option value="RECENTLY PRODUCTS">RECENTLY PRODUCTS</option>
     <option value="HOT MODS">HOT MODS</option>
     <option value="BEST SELLING MODS">BEST SELLING MODS</option>
@@ -530,6 +559,9 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
           Price
         </th>
         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">
+        Varient
+        </th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">
          Category
         </th>
         <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700">
@@ -553,10 +585,15 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
         {Product.price}
         </td>
         <td class="px-6 py-4 text-base">
-        {Product.category}
+        {Product.varient}
         </td>
         <td class="px-6 py-4 text-base">
-        {Product.MemberType}
+        {Product.category}
+        </td>
+        <td class="px-6 py-4 text-xs">
+        {Product.MemberType.map((member) => (
+                    <span key={member.value}>{member.label}, </span>
+                  ))}
         </td>
         <td class="px-6 py-4">
           <button   onClick={() => handleEditDetails(Product)} class="mr-4" title="Edit">
@@ -801,26 +838,35 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
              
          
                 <div>
-  <label htmlFor="MemberType" className="block text-sm font-medium text-black">
+  <label htmlFor="varient" className="block text-sm font-medium text-black">
    MemberType Product
   </label>
   <select
-    id="MemberType"
-    name="MemberType"
-    value={editedProduct.MemberType}
+    id="varient"
+    name="varient"
+    value={editedProduct.varient}
     onChange={(e) =>
       setEditedProduct({
         ...editedProduct,
-        MemberType: e.target.value,
+        varient: e.target.value,
       })
     }
     className="mt-1 focus:ring-red-500 focus:border-red-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
   >
-    <option value="">Select MemberType Products</option>
-    <option value="SILVER MEMBER">SILVER MEMBER</option>
-    <option value="GOLD MEMBER">GOLD MEMBER</option>
-    <option value="DIAMOND MEMBER">DIAMOND MEMBER</option>
+ <option value="">Select Varient</option>
+    <option value="Normal">Normal</option>
+    <option value="Paidmod">Paidmod</option>
+    <option value="Bundle">Bundle</option>
   </select>
+</div>
+                <div>
+                <Select
+                      name="MemberType"
+                      value={editedProduct.MemberType}
+                      onChange={handleEditSelectChange}
+                      options={Members}
+                      isMulti
+                    />
 </div>
                 <div>
   <label htmlFor="category" className="block text-sm font-medium text-black">
@@ -839,6 +885,7 @@ const handleReviewApproval = async (reviewId, newStatus, shouldDelete = false) =
     className="mt-1 focus:ring-red-500 focus:border-red-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
   >
     <option value="">Select Category</option>
+    <option value="NONE">NONE</option>
     <option value="RECENTLY PRODUCTS">RECENTLY PRODUCTS</option>
     <option value="HOT MODS">HOT MODS</option>
     <option value="BEST SELLING MODS">BEST SELLING MODS</option>

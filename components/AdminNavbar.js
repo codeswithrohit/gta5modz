@@ -92,7 +92,7 @@ function SideNavbar() {
       </h3>
     </Link>
 
-              <Link href='/Admin/Paidmod' className={`flex  mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer m-auto ${
+              {/* <Link href='/Admin/Paidmod' className={`flex  mb-2 justify-start items-center gap-4 pl-5 p-2 rounded-md group cursor-pointer m-auto ${
       router.pathname === '/Admin/Paidmod' ? 'bg-red-600 hover:bg-red-700' : 'hover:bg-gray-900'
     }`}>
       <IoIosAddCircle className={`text-2xl ${
@@ -115,7 +115,7 @@ function SideNavbar() {
       } font-semibold`}>
        Game Bundle Mod
       </h3>
-    </Link>
+    </Link> */}
              
 
 

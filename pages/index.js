@@ -1,3 +1,4 @@
+import Banner from '@/components/Banner'
 import Footer from '@/components/Footer'
 import Gameproduct from '@/components/Gameproduct'
 import HomeCarousel from '@/components/HomeCarousel'
@@ -15,7 +16,9 @@ const Index = ({Productdata,addToCart,membertype,user}) => {
       <HomeCarousel/>
       {/* <Indexfirest/>
       <IndexTwo/> */}
+      
       <Recentlyupdated Productdata={Productdata} addToCart={addToCart} membertype={membertype} user={user} />
+      <Banner/>
       <Testimonial/>
       <Gameproduct Productdata={Productdata} addToCart={addToCart} membertype={membertype} user={user}  />
     </div>

@@ -3,32 +3,8 @@ import { useRouter } from "next/router";
 import { firebase } from "../Firebase/config";
 import { RiDownload2Line } from 'react-icons/ri'; 
 
-const RecentlyUpdated = ({addToCart, membertype}) => {
-    const [Productdata, setProductData] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-  useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(() => {
-      const db = firebase.firestore();
-      const ProductsRef = db.collection("Paidmod");
-
-      ProductsRef.get()
-        .then((querySnapshot) => {
-          const Productdata = [];
-          querySnapshot.forEach((doc) => {
-            Productdata.push({ ...doc.data(), id: doc.id });
-          });
-
-          setProductData(Productdata);
-          setIsLoading(false); // Set isLoading to false when data is fetched
-        })
-        .catch((error) => {
-          console.error("Error getting documents: ", error);
-          setIsLoading(false); // Also set isLoading to false on error
-        });
-    });
-
-    return () => unsubscribe();
-  }, []);
+const RecentlyUpdated = ({addToCart, membertype,Productdata}) => {
+  const Products = Productdata.filter(product => product.varient === "Paidmod");
   const [downloading, setDownloading] = useState(false);
   const handleDownload = (url) => {
     setDownloading(true); // Set downloading status to true
@@ -45,14 +21,21 @@ const RecentlyUpdated = ({addToCart, membertype}) => {
         <h2 class="text-xl font-extrabold text-gray-800 mb-12">Paid Mod</h2>
 
         <div class="grid grid-cols-1 md:grid-cols-5 lg:grid-cols-5 gap-6">
-          {Productdata.map((Product) => (
+          {Products.map((Product) => (
             <div class="bg-gray-100 rounded-2xl p-6 cursor-pointer hover:-translate-y-2 transition-all relative">
-              {/* <div class="w-30 h-10 flex items-center justify-center rounded-full cursor-pointer absolute -top-2 right-1">
-                <span className="uppercase text-xs bg-green-50 p-0.5 border-green-500 border rounded text-green-700 font-medium select-none">
-                  {Product.MemberType}
-                </span>
-              </div> */}
-              <a href={`/Product-Details2?id=${Product.id}`} >
+           <div className="absolute top-0 left-2 flex flex-row gap-1">
+                {Product.MemberType.map((member) => (
+                  <div
+                    key={member.value}
+                    className="w-30 h-10 flex flex-row items-center justify-center rounded-full cursor-pointer"
+                  >
+                    <span className="uppercase text-[8px] bg-green-50 p-0.5 border-green-500 border rounded text-green-700 font-medium select-none">
+                      {member.label}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <a href={`/Product-Details?id=${Product.id}`} >
               <div class="w-4/3 h-[120px] overflow-hidden mx-auto aspect-w-16 aspect-h-8">
                 <img src={Product.frontImage} alt={Product.name} class="h-full w-full rounded-xl object-contain" />
               </div>
@@ -61,6 +44,7 @@ const RecentlyUpdated = ({addToCart, membertype}) => {
                 <h3 class="text-sm font-extrabold text-gray-800">{Product.name}</h3>
                 <h4 class="text-xl text-gray-800 font-bold mt-4">${Product.price}</h4>
                
+
                 {membertype === 'DIAMOND MEMBER' ? (
     <button
       type="button"

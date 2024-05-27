@@ -147,7 +147,7 @@ const initiatePayment = async () => {
 
     const options = {
       key: 'rzp_test_td8CxckGpxFssp', // Replace 'YOUR_RAZORPAY_KEY' with your actual Razorpay API key
-      currency: 'INR',
+      currency: 'USD',
       amount: amountInPaise,
       name: 'Games',
       description: 'Thanks for purchasing',
@@ -383,7 +383,7 @@ const applyCoupon = () => {
                     onClick={initiatePayment}
                     class="mt-4 inline-flex w-full items-center justify-center rounded bg-red-600 py-2.5 px-4 text-base font-semibold tracking-wide text-white text-opacity-80 outline-none ring-offset-2 transition hover:text-opacity-100 focus:ring-2 focus:ring-red-600 sm:text-lg"
                   >
-                    Make Payment ₹{subTotal}
+                    Make Payment ${subTotal}
                   </button>
                 </Link>
               )}
@@ -410,7 +410,7 @@ const applyCoupon = () => {
             {cart[k].name}
           </span>
           <p className="text-lg font-bold text-center">
-            ₹ {cart[k].price}
+            $ {cart[k].price}
           </p>
           
         </div>

@@ -155,7 +155,7 @@ const Subscription = ({user,userData}) => {
   
       const options = {
         key: 'rzp_test_td8CxckGpxFssp', // Replace 'YOUR_RAZORPAY_KEY' with your actual Razorpay API key
-        currency: 'INR',
+        currency: 'USD',
         amount: amountInPaise,
         name: 'Games',
         description: 'Thanks for purchasing',
